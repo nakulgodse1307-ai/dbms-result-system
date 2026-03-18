@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "roll": "22CS101",
+    "name": "Aarya Kulkarni",
+    "div": "A",
+    "email": "aarya@college.edu",
+    "phone": "+91 98765 43210",
+    "prn": "220110101"
+  },
+  {
+    "id": 2,
+    "roll": "22CS102",
+    "name": "Rohan Desai",
+    "div": "A",
+    "email": "rohan@college.edu",
+    "phone": "+91 98765 43211",
+    "prn": "220110102"
+  },
+  {
+    "id": 3,
+    "roll": "22CS103",
+    "name": "Priya Joshi",
+    "div": "B",
+    "email": "priya@college.edu",
+    "phone": "+91 98765 43212",
+    "prn": "220110103"
+  },
+  {
+    "id": 4,
+    "roll": "22CS104",
+    "name": "Amit Patil",
+    "div": "B",
+    "email": "amit@college.edu",
+    "phone": "+91 98765 43213",
+    "prn": "220110104"
+  },
+  {
+    "id": 5,
+    "roll": "22CS105",
+    "name": "Sneha Nair",
+    "div": "C",
+    "email": "sneha@college.edu",
+    "phone": "+91 98765 43214",
+    "prn": "220110105"
+  },
+  {
+    "id": 6,
+    "roll": "22CS106",
+    "name": "Vikram Singh",
+    "div": "C",
+    "email": "vikram@college.edu",
+    "phone": "+91 98765 43215",
+    "prn": "220110106"
+  },
+  {
+    "id": 7,
+    "roll": "22CS107",
+    "name": "Divya Mehta",
+    "div": "D",
+    "email": "divya@college.edu",
+    "phone": "+91 98765 43216",
+    "prn": "220110107"
+  },
+  {
+    "id": 8,
+    "roll": "22CS108",
+    "name": "Karan Shah",
+    "div": "D",
+    "email": "karan@college.edu",
+    "phone": "+91 98765 43217",
+    "prn": "220110108"
+  },
+  {
+    "id": 9,
+    "roll": "4",
+    "name": "nakul",
+    "div": "A",
+    "email": "nakulgodse1307@gmail.com",
+    "phone": "882533",
+    "prn": "141"
+  },
+  {
+    "id": 10,
+    "roll": "55",
+    "name": "nutan jagtap",
+    "div": "A",
+    "email": "xyzgmail.com",
+    "phone": "+918830705649",
+    "prn": "4454"
+  }
+]
