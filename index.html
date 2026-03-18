@@ -1,334 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DBMS Result System</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>DBMS Result System</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-mark">DB</div>
-      <div class="brand-text">
-        <span class="brand-title">DBMS</span>
-        <span class="brand-sub">Result System</span>
-      </div>
-    </div>
-
-    <nav class="sidebar-nav">
-      <a href="#" class="nav-item active" data-page="dashboard">
-        <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity=".4"/><rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity=".4"/></svg>
-        Dashboard
-      </a>
-      <a href="#" class="nav-item" data-page="students">
-        <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3.5" fill="currentColor" opacity=".4"/><path d="M3 17c0-3.314 3.134-6 7-6s7 2.686 7 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Students
-      </a>
-      <a href="#" class="nav-item" data-page="results">
-        <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" fill="currentColor" opacity=".2"/><path d="M6 7h8M6 10h8M6 13h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Results
-      </a>
-      <a href="#" class="nav-item" data-page="analytics">
-        <svg viewBox="0 0 20 20" fill="none"><path d="M3 15l4-5 4 3 6-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Analytics
-      </a>
-      <div class="nav-divider"></div>
-      <a href="#" class="nav-item" data-page="github">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.268 2.75 1.026A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.026 2.747-1.026.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.744 0 .267.18.579.688.481C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd"/></svg>
-        GitHub Sync
-      </a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="footer-status" id="sync-status">
-        <span class="status-dot offline" id="status-dot"></span>
-        <span class="status-label" id="status-label">Not connected</span>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main-content">
-    <header class="topbar">
-      <div class="topbar-left">
-        <button class="menu-toggle" id="menu-toggle">
-          <span></span><span></span><span></span>
-        </button>
-        <div class="page-title-area">
-          <h1 class="page-title" id="page-title">Dashboard</h1>
-          <p class="page-subtitle" id="page-subtitle">DBMS · Batch 2022–26</p>
-        </div>
-      </div>
-      <div class="topbar-right">
-        <div class="search-pill">
-          <svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-          <input type="text" placeholder="Search…" id="global-search" oninput="globalSearch(this.value)" autocomplete="off" />
-        </div>
-        <button class="btn btn-outline btn-sm" onclick="exportCSV()">↓ CSV</button>
-        <div class="topbar-clock" id="topbar-clock"></div>
-      </div>
-    </header>
-
-    <div class="page-container">
-
-      <!-- DASHBOARD -->
-      <section class="page active" id="page-dashboard">
-        <div class="stat-grid" id="stat-grid"></div>
-        <div class="grid-2" style="margin-top:18px">
-          <div class="card">
-            <div class="card-head"><span class="card-label">Grade Distribution</span><span class="card-meta" id="grade-meta"></span></div>
-            <div class="bar-chart" id="grade-chart"></div>
-          </div>
-          <div class="card">
-            <div class="card-head"><span class="card-label">Top Performers</span></div>
-            <div id="top-list"></div>
-          </div>
-        </div>
-        <div class="card" style="margin-top:18px">
-          <div class="card-head"><span class="card-label">Quick Overview</span></div>
-          <div id="quick-overview"></div>
-        </div>
-      </section>
-
-      <!-- STUDENTS -->
-      <section class="page" id="page-students">
-        <div class="action-bar">
-          <div class="filter-row">
-            <input class="search-box" type="text" placeholder="Name or roll no…" id="stu-search" oninput="renderStudents()" />
-            <select class="sel" id="stu-div" onchange="renderStudents()">
-              <option value="">All Divisions</option>
-              <option>A</option><option>B</option><option>C</option><option>D</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" onclick="openStudentModal()">+ Add Student</button>
-        </div>
-        <div class="card no-pad">
-          <table class="tbl">
-            <thead><tr><th>#</th><th>Roll</th><th>Name</th><th>Div</th><th>Email</th><th>PRN</th><th>Results</th><th>Actions</th></tr></thead>
-            <tbody id="stu-tbody"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- RESULTS -->
-      <section class="page" id="page-results">
-        <div class="action-bar">
-          <div class="filter-row">
-            <input class="search-box" type="text" placeholder="Search results…" id="res-search" oninput="renderResults()" />
-            <select class="sel" id="res-exam" onchange="renderResults()">
-              <option value="">All Exams</option>
-              <option>Unit Test I</option><option>Unit Test II</option>
-              <option>Unit Test III</option><option>Unit Test IV</option>
-              <option>Semester End</option>
-            </select>
-            <select class="sel" id="res-div" onchange="renderResults()">
-              <option value="">All Divisions</option>
-              <option>A</option><option>B</option><option>C</option><option>D</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" onclick="openResultModal()">+ Add Marks</button>
-        </div>
-        <div class="card no-pad">
-          <table class="tbl">
-            <thead><tr>
-              <th>Rank</th><th>Roll</th><th>Name</th><th>Div</th><th>Exam</th>
-              <th>Prac/25</th><th>Int/25</th><th>Thy/50</th>
-              <th>Total</th><th>%</th><th>Grade</th><th>Status</th><th>Actions</th>
-            </tr></thead>
-            <tbody id="res-tbody"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- ANALYTICS -->
-      <section class="page" id="page-analytics">
-        <div class="stat-grid" id="ana-stats"></div>
-        <div class="grid-2" style="margin-top:18px">
-          <div class="card">
-            <div class="card-head"><span class="card-label">Pass / Fail Breakdown</span></div>
-            <div id="pf-wrap"></div>
-          </div>
-          <div class="card">
-            <div class="card-head"><span class="card-label">Score Distribution</span></div>
-            <div class="bar-chart" id="score-chart"></div>
-          </div>
-        </div>
-        <div class="card" style="margin-top:18px">
-          <div class="card-head">
-            <span class="card-label">Full Result Sheet</span>
-            <div style="display:flex;gap:8px">
-              <select class="sel" id="sheet-exam" onchange="renderSheet()" style="width:160px"><option value="">All Exams</option><option>Unit Test I</option><option>Unit Test II</option><option>Unit Test III</option><option>Unit Test IV</option><option>Semester End</option></select>
-              <button class="btn btn-outline btn-sm" onclick="printSheet()">Print ↗</button>
-            </div>
-          </div>
-          <div id="sheet-wrap"></div>
-        </div>
-      </section>
-
-      <!-- GITHUB -->
-      <section class="page" id="page-github">
-        <!-- Connect form (shown when not connected) -->
-        <div id="gh-connect" class="gh-connect-wrap">
-          <div class="gh-hero">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48" style="opacity:.8"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.268 2.75 1.026A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.026 2.747-1.026.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.744 0 .267.18.579.688.481C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd"/></svg>
-            <h2>Connect to GitHub</h2>
-            <p>Store exam data as JSON in your GitHub repository. Real-time sync on every save.</p>
-          </div>
-          <div class="gh-form">
-            <div class="gh-field">
-              <label>Personal Access Token <span class="req">*</span></label>
-              <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
-              <div class="field-hint">Needs <code>repo</code> scope · <a href="https://github.com/settings/tokens/new?scopes=repo&description=DBMS+Result+System" target="_blank">Generate token ↗</a></div>
-            </div>
-            <div class="gh-row">
-              <div class="gh-field">
-                <label>GitHub Username <span class="req">*</span></label>
-                <input type="text" id="gh-owner" placeholder="your-username" />
-              </div>
-              <div class="gh-field">
-                <label>Repository Name <span class="req">*</span></label>
-                <input type="text" id="gh-repo-name" placeholder="dbms-results" />
-              </div>
-            </div>
-            <div class="gh-field">
-              <label>File Path in Repo</label>
-              <input type="text" id="gh-file-path" value="data/results.json" placeholder="data/results.json" />
-            </div>
-            <div id="gh-conn-error" class="gh-error" style="display:none"></div>
-            <div class="gh-buttons">
-              <button class="btn btn-primary" id="gh-connect-btn" onclick="ghConnect()">Connect Repository</button>
-              <a class="btn btn-outline" href="https://github.com/new" target="_blank">Create New Repo ↗</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Connected UI -->
-        <div id="gh-connected" style="display:none">
-          <div class="gh-banner">
-            <div class="gh-banner-left">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.268 2.75 1.026A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.026 2.747-1.026.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.744 0 .267.18.579.688.481C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd"/></svg>
-              <div>
-                <div class="gh-banner-repo" id="gh-display-repo"></div>
-                <div class="gh-banner-file" id="gh-display-file"></div>
-              </div>
-            </div>
-            <div class="gh-banner-right">
-              <span class="conn-badge">● Connected</span>
-              <button class="btn btn-outline btn-sm" onclick="ghPull()">↓ Pull</button>
-              <button class="btn btn-primary btn-sm" onclick="ghPush()">↑ Push</button>
-              <button class="btn btn-danger btn-sm" onclick="ghDisconnect()">Disconnect</button>
-            </div>
-          </div>
-
-          <div class="grid-2" style="margin-top:18px">
-            <div class="card">
-              <div class="card-head"><span class="card-label">Commit Log</span></div>
-              <div id="gh-commit-log">Loading…</div>
-            </div>
-            <div class="card">
-              <div class="card-head"><span class="card-label">Push Changes</span></div>
-              <div class="gh-push-form">
-                <div class="gh-field">
-                  <label>Commit Message</label>
-                  <input type="text" id="gh-commit-msg" placeholder="Update results for Unit Test IV" />
-                </div>
-                <div class="gh-field">
-                  <label>Branch</label>
-                  <select id="gh-branch"><option value="main">main</option><option value="develop">develop</option></select>
-                </div>
-                <button class="btn btn-primary" style="margin-top:10px" onclick="ghPush()">↑ Push to GitHub</button>
-                <div class="push-log" id="push-output" style="display:none"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card" style="margin-top:18px">
-            <div class="card-head"><span class="card-label">Stored JSON</span><button class="btn btn-outline btn-sm" onclick="refreshJsonPreview()">Refresh</button></div>
-            <pre class="json-preview" id="json-preview">Not loaded yet</pre>
-          </div>
-        </div>
-      </section>
-
-    </div>
-  </main>
-
-  <!-- MODALS -->
-  <div class="modal-bg" id="student-modal" onclick="bgClose(event,'student-modal')">
-    <div class="modal">
-      <div class="modal-head">
-        <h3 id="stu-modal-title">Add Student</h3>
-        <button class="modal-x" onclick="closeModal('student-modal')">✕</button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="stu-edit-id" />
-        <div class="form-row">
-          <div class="form-group"><label>Roll Number *</label><input id="sf-roll" placeholder="22CS101" /></div>
-          <div class="form-group"><label>Full Name *</label><input id="sf-name" placeholder="Arjun Sharma" /></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Division *</label><select id="sf-div"><option>A</option><option>B</option><option>C</option><option>D</option></select></div>
-          <div class="form-group"><label>PRN</label><input id="sf-prn" placeholder="220110101" /></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Email</label><input id="sf-email" type="email" placeholder="student@college.edu" /></div>
-          <div class="form-group"><label>Phone</label><input id="sf-phone" placeholder="+91 98765 43210" /></div>
-        </div>
-      </div>
-      <div class="modal-foot">
-        <button class="btn btn-outline" onclick="closeModal('student-modal')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveStudent()">Save</button>
-      </div>
-    </div>
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-icon">DB</div>
+    <div><div class="sb-title">DBMS<span class="sb-acc">RMS</span></div><div class="sb-sub">Result Management</div></div>
   </div>
-
-  <div class="modal-bg" id="result-modal" onclick="bgClose(event,'result-modal')">
-    <div class="modal">
-      <div class="modal-head">
-        <h3 id="res-modal-title">Add Marks</h3>
-        <button class="modal-x" onclick="closeModal('result-modal')">✕</button>
+  <nav class="sb-nav">
+    <a class="nav-it active" onclick="navigate('dashboard',this)">Dashboard</a>
+    <a class="nav-it" onclick="navigate('students',this)">Students</a>
+    <a class="nav-it" onclick="navigate('marks',this)">Marks and Grades</a>
+    <a class="nav-it" onclick="navigate('results',this)">Results and Report</a>
+    <a class="nav-it" onclick="navigate('search',this)">Search and Filter</a>
+  </nav>
+  <div class="sb-foot">
+    <div class="gh-st"><div class="gh-dot off" id="gh-dot"></div><span id="gh-st-txt">Not Connected</span></div>
+    <button class="btn-ghc" onclick="openModal('gh-modal')">GitHub Config</button>
+  </div>
+</aside>
+<main class="main">
+  <header class="topbar">
+    <div><div class="pg-title" id="pg-title">Dashboard</div><div class="pg-bc">DBMS Result Management System</div></div>
+    <div class="tb-right">
+      <button class="btn btn-o" onclick="pullGH()">Pull from GitHub</button>
+      <button class="btn btn-p" onclick="pushGH()">Push to GitHub</button>
+    </div>
+  </header>
+  <div class="sec active" id="sec-dashboard">
+    <div class="g4" id="stats"></div>
+    <div class="g2">
+      <div class="card"><div class="card-h"><span class="card-t">Grade Distribution</span></div><div class="gb" id="grade-bars"></div></div>
+      <div class="card"><div class="card-h"><span class="card-t">Top Performers</span></div><div id="top-list"></div></div>
+    </div>
+    <div class="card mt"><div class="card-h"><span class="card-t">Quick Overview</span><button class="btn btn-sm btn-o" onclick="exportCSV()">Export CSV</button></div><div id="dash-table"></div></div>
+  </div>
+  <div class="sec" id="sec-students">
+    <div class="sec-act"><button class="btn btn-p" onclick="openStudentModal()">Add Student</button></div>
+    <div class="card"><div class="card-h"><span class="card-t">Student Records</span><input type="text" placeholder="Search..." oninput="renderStudents(this.value)" style="background:#1c2340;border:1px solid rgba(99,130,200,0.22);color:#dde2f4;border-radius:8px;padding:6px 12px;font-size:13px;outline:none;width:200px"/></div><div id="stu-table"></div></div>
+  </div>
+  <div class="sec" id="sec-marks">
+    <div class="sec-act"><button class="btn btn-p" onclick="openMarksModal()">Add Marks</button></div>
+    <div class="card"><div class="card-h"><span class="card-t">Marks and Grades</span><select class="ssl" onchange="renderMarks(this.value)" style="background:#1c2340;border:1px solid rgba(99,130,200,0.22);color:#dde2f4;border-radius:8px;padding:6px 10px;font-size:12px;outline:none"><option value="">All Exams</option><option>Unit Test I</option><option>Unit Test II</option><option>Unit Test III</option><option>Unit Test IV</option><option>Semester End</option></select></div><div id="marks-table"></div></div>
+  </div>
+  <div class="sec" id="sec-results">
+    <div class="g3 mt" id="res-stats"></div>
+    <div class="card mt"><div class="card-h"><span class="card-t">Result Report</span><div style="display:flex;gap:8px"><button class="btn btn-sm btn-o" onclick="exportCSV()">CSV</button><button class="btn btn-sm btn-o" onclick="window.print()">Print</button></div></div><div id="res-table"></div></div>
+    <div class="card mt"><div class="card-h"><span class="card-t">Score Distribution</span></div><div class="bc" id="score-chart"></div></div>
+  </div>
+  <div class="sec" id="sec-search">
+    <div class="card" style="border-radius:14px;overflow:hidden;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:14px;padding:20px 22px;border-bottom:1px solid rgba(99,130,200,0.12);color:#6b739e">
+        <span style="font-size:20px">&#128269;</span>
+        <input style="flex:1;background:transparent;border:none;color:#dde2f4;font-size:18px;font-family:IBM Plex Sans,sans-serif;outline:none" id="big-search" placeholder="Search by name, roll or grade..." oninput="doSearch(this.value)"/>
       </div>
-      <div class="modal-body">
-        <input type="hidden" id="res-edit-id" />
-        <div class="form-row">
-          <div class="form-group" style="flex:2"><label>Student *</label><select id="rf-student"></select></div>
-          <div class="form-group"><label>Exam *</label>
-            <select id="rf-exam"><option>Unit Test I</option><option>Unit Test II</option><option>Unit Test III</option><option selected>Unit Test IV</option><option>Semester End</option></select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Practical <em>/25</em></label><input type="number" id="rf-practical" min="0" max="25" placeholder="0" oninput="livePreview()" /></div>
-          <div class="form-group"><label>Internal <em>/25</em></label><input type="number" id="rf-internal" min="0" max="25" placeholder="0" oninput="livePreview()" /></div>
-          <div class="form-group"><label>Theory <em>/50</em></label><input type="number" id="rf-theory" min="0" max="50" placeholder="0" oninput="livePreview()" /></div>
-        </div>
-        <div class="marks-preview" id="marks-preview">
-          <div class="mp-item"><div class="mp-val" id="pv-total">0/100</div><div class="mp-lab">Total</div></div>
-          <div class="mp-item"><div class="mp-val" id="pv-pct">0%</div><div class="mp-lab">Percentage</div></div>
-          <div class="mp-item"><div class="mp-val" id="pv-grade">—</div><div class="mp-lab">Grade</div></div>
-          <div class="mp-item"><div class="mp-val" id="pv-status">—</div><div class="mp-lab">Status</div></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Override Status</label>
-            <select id="rf-status"><option value="auto">Auto-detect</option><option>Pass</option><option>Fail</option><option>Withheld</option></select>
-          </div>
-        </div>
-      </div>
-      <div class="modal-foot">
-        <button class="btn btn-outline" onclick="closeModal('result-modal')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveResult()">Save</button>
+      <div style="display:flex;gap:10px;padding:14px 22px;flex-wrap:wrap">
+        <select onchange="doSearch(document.getElementById('big-search').value)" id="sf-exam" style="background:#1c2340;border:1px solid rgba(99,130,200,0.22);color:#dde2f4;border-radius:8px;padding:6px 10px;font-size:12px;outline:none;flex:1;min-width:120px"><option value="">All Exams</option><option>Unit Test I</option><option>Unit Test II</option><option>Unit Test III</option><option>Unit Test IV</option><option>Semester End</option></select>
+        <select onchange="doSearch(document.getElementById('big-search').value)" id="sf-div" style="background:#1c2340;border:1px solid rgba(99,130,200,0.22);color:#dde2f4;border-radius:8px;padding:6px 10px;font-size:12px;outline:none;flex:1;min-width:120px"><option value="">All Divisions</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+        <select onchange="doSearch(document.getElementById('big-search').value)" id="sf-st" style="background:#1c2340;border:1px solid rgba(99,130,200,0.22);color:#dde2f4;border-radius:8px;padding:6px 10px;font-size:12px;outline:none;flex:1;min-width:120px"><option value="">All Status</option><option>Pass</option><option>Fail</option><option>Withheld</option></select>
+        <select onchange="doSearch(document.getElementById('big-search').value)" id="sf-gr" style="background:#1c2340;border:1px solid rgba(99,130,200,0.22);color:#dde2f4;border-radius:8px;padding:6px 10px;font-size:12px;outline:none;flex:1;min-width:120px"><option value="">All Grades</option><option>O</option><option>A+</option><option>A</option><option>B+</option><option>B</option><option>C</option><option>F</option></select>
       </div>
     </div>
+    <div class="card"><div class="card-h"><span class="card-t">Results</span><span id="s-count" style="font-size:11px;font-family:IBM Plex Mono,monospace;color:#6b739e"></span></div><div id="s-results"></div></div>
   </div>
-
-  <div class="toast-wrap" id="toasts"></div>
-
-  <script src="js/data.js"></script>
-  <script src="js/github.js"></script>
-  <script src="js/app.js"></script>
+</main>
+<div class="modal-overlay" id="stu-modal" onclick="if(event.target===this)closeModal('stu-modal')">
+  <div class="modal">
+    <div class="modal-h"><span id="stu-modal-title">Add Student</span><button class="modal-x" onclick="closeModal('stu-modal')">X</button></div>
+    <div class="modal-b">
+      <input type="hidden" id="s-eid"/>
+      <div class="fg">
+        <div class="fgp"><label>Roll Number</label><input id="s-roll" placeholder="e.g. 22CS101"/></div>
+        <div class="fgp"><label>Full Name</label><input id="s-name" placeholder="e.g. Priya Joshi"/></div>
+        <div class="fgp"><label>Division</label><select id="s-div"><option>A</option><option>B</option><option>C</option><option>D</option></select></div>
+        <div class="fgp"><label>Email</label><input id="s-email" placeholder="student@college.edu"/></div>
+        <div class="fgp"><label>Phone</label><input id="s-phone" placeholder="+91 XXXXX XXXXX"/></div>
+        <div class="fgp"><label>PRN</label><input id="s-prn" placeholder="PRN number"/></div>
+      </div>
+    </div>
+    <div class="modal-f"><button class="btn btn-o" onclick="closeModal('stu-modal')">Cancel</button><button class="btn btn-p" onclick="saveStudent()">Save Student</button></div>
+  </div>
+</div>
+<div class="modal-overlay" id="mrk-modal" onclick="if(event.target===this)closeModal('mrk-modal')">
+  <div class="modal">
+    <div class="modal-h"><span id="mrk-modal-title">Add Marks</span><button class="modal-x" onclick="closeModal('mrk-modal')">X</button></div>
+    <div class="modal-b">
+      <input type="hidden" id="m-eid"/>
+      <div class="fg">
+        <div class="fgp" style="grid-column:1/-1"><label>Student</label><select id="m-stu"></select></div>
+        <div class="fgp"><label>Exam</label><select id="m-exam"><option>Unit Test I</option><option>Unit Test II</option><option>Unit Test III</option><option selected>Unit Test IV</option><option>Semester End</option></select></div>
+        <div class="fgp"><label>Status</label><select id="m-st"><option>Pass</option><option>Fail</option><option>Withheld</option></select></div>
+        <div class="fgp"><label>Practical max 25</label><input id="m-pr" type="number" min="0" max="25" oninput="livePreview()"/></div>
+        <div class="fgp"><label>Internal max 25</label><input id="m-in" type="number" min="0" max="25" oninput="livePreview()"/></div>
+        <div class="fgp"><label>Theory max 50</label><input id="m-th" type="number" min="0" max="50" oninput="livePreview()"/></div>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:24px;padding:12px 16px;background:#1c2340;border-radius:8px;font-size:12px;color:#6b739e">
+        <span>Total: <strong id="pv-tot" style="color:#00e5ff;font-family:IBM Plex Mono,monospace">0</strong></span>
+        <span>Percentage: <strong id="pv-pct" style="color:#00e5ff;font-family:IBM Plex Mono,monospace">0%</strong></span>
+        <span>Grade: <strong id="pv-gr" style="color:#00e5ff;font-family:IBM Plex Mono,monospace">F</strong></span>
+      </div>
+    </div>
+    <div class="modal-f"><button class="btn btn-o" onclick="closeModal('mrk-modal')">Cancel</button><button class="btn btn-p" onclick="saveMarks()">Save Marks</button></div>
+  </div>
+</div>
+<div class="modal-overlay" id="gh-modal" onclick="if(event.target===this)closeModal('gh-modal')">
+  <div class="modal">
+    <div class="modal-h"><span>GitHub Config</span><button class="modal-x" onclick="closeModal('gh-modal')">X</button></div>
+    <div class="modal-b">
+      <div class="fg">
+        <div class="fgp" style="grid-column:1/-1"><label>Personal Access Token</label><input id="gh-tok" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"/></div>
+        <div class="fgp"><label>GitHub Username</label><input id="gh-own" placeholder="nakulgodse1307-ai"/></div>
+        <div class="fgp"><label>Repository Name</label><input id="gh-rep" placeholder="dbms-result-system"/></div>
+        <div class="fgp" style="grid-column:1/-1"><label>Branch</label><input id="gh-br" value="main"/></div>
+      </div>
+    </div>
+    <div class="modal-f"><button class="btn btn-o" onclick="closeModal('gh-modal')">Cancel</button><button class="btn btn-p" onclick="saveGHConfig()">Connect and Test</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
 </body>
 </html>
