@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "studentId": 1,
+    "exam": "Unit Test IV",
+    "practical": 23,
+    "internal": 22,
+    "theory": 44,
+    "status": "Pass"
+  },
+  {
+    "id": 2,
+    "studentId": 2,
+    "exam": "Unit Test IV",
+    "practical": 18,
+    "internal": 20,
+    "theory": 38,
+    "status": "Pass"
+  },
+  {
+    "id": 3,
+    "studentId": 3,
+    "exam": "Unit Test IV",
+    "practical": 25,
+    "internal": 24,
+    "theory": 48,
+    "status": "Pass"
+  },
+  {
+    "id": 4,
+    "studentId": 4,
+    "exam": "Unit Test IV",
+    "practical": 12,
+    "internal": 14,
+    "theory": 22,
+    "status": "Fail"
+  },
+  {
+    "id": 5,
+    "studentId": 5,
+    "exam": "Unit Test IV",
+    "practical": 20,
+    "internal": 21,
+    "theory": 40,
+    "status": "Pass"
+  },
+  {
+    "id": 6,
+    "studentId": 6,
+    "exam": "Unit Test IV",
+    "practical": 15,
+    "internal": 16,
+    "theory": 30,
+    "status": "Pass"
+  },
+  {
+    "id": 7,
+    "studentId": 7,
+    "exam": "Unit Test IV",
+    "practical": 24,
+    "internal": 23,
+    "theory": 46,
+    "status": "Pass"
+  },
+  {
+    "id": 8,
+    "studentId": 8,
+    "exam": "Unit Test IV",
+    "practical": 9,
+    "internal": 10,
+    "theory": 18,
+    "status": "Fail"
+  },
+  {
+    "id": 9,
+    "studentId": 9,
+    "exam": "Unit Test IV",
+    "practical": 25,
+    "internal": 25,
+    "theory": 50,
+    "status": "Pass"
+  },
+  {
+    "id": 10,
+    "studentId": 10,
+    "exam": "Unit Test IV",
+    "practical": 24,
+    "internal": 25,
+    "theory": 49,
+    "status": "Pass"
+  }
+]
