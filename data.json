@@ -1,29 +1,145 @@
 {
-  "students": [],
-  "subjects": [
+  "students": [
     {
-      "name": "Mathematics",
-      "code": "MATH301"
+      "id": 1,
+      "roll": "45",
+      "name": "namita",
+      "div": "A",
+      "prn": "1212",
+      "email": "xyzgmail.com",
+      "phone": "+918830705649"
     },
     {
-      "name": "Science",
-      "code": "SCI301"
+      "id": 2,
+      "roll": "6566",
+      "name": "nutan jagtap",
+      "div": "A",
+      "prn": "4454",
+      "email": "xymmzgmail.com",
+      "phone": "+919021488244"
     },
     {
-      "name": "English",
-      "code": "ENG301"
+      "id": 3,
+      "roll": "22CS101",
+      "name": "Sample Student",
+      "div": "A",
+      "prn": "PRN001",
+      "email": "",
+      "phone": ""
     },
     {
-      "name": "Hindi",
-      "code": "HIN301"
-    },
-    {
-      "name": "Computer",
-      "code": "CS301"
+      "id": 4,
+      "roll": "44",
+      "name": "helllo",
+      "div": "a",
+      "prn": "jbkj",
+      "email": "",
+      "phone": ""
     }
   ],
-  "marksData": [],
-  "nextStuId": 1,
-  "nextMarkId": 1,
-  "pushTime": "2026-04-04T17:45:14.763Z"
+  "subjects": [
+    {
+      "name": "dbms",
+      "code": "1"
+    },
+    {
+      "name": "m3",
+      "code": "2"
+    }
+  ],
+  "marksData": [
+    {
+      "id": 1,
+      "studentId": 1,
+      "term": "Semester IV",
+      "status": "Pass",
+      "marks": {
+        "dbms": {
+          "cce": [
+            8,
+            8,
+            8,
+            8,
+            4
+          ],
+          "ese": 0,
+          "tw": 25
+        },
+        "m3": {
+          "cce": [
+            8,
+            8,
+            8,
+            4,
+            8
+          ],
+          "ese": 0,
+          "tw": 0
+        }
+      }
+    },
+    {
+      "id": 2,
+      "studentId": 3,
+      "term": "Semester I",
+      "status": "Pass",
+      "marks": {
+        "dbms": {
+          "cce": [
+            7,
+            7,
+            7,
+            7,
+            7
+          ],
+          "ese": 45,
+          "tw": 20
+        },
+        "m3": {
+          "cce": [
+            7,
+            7,
+            7,
+            7,
+            7
+          ],
+          "ese": 45,
+          "tw": 20
+        }
+      }
+    },
+    {
+      "id": 3,
+      "studentId": 4,
+      "term": "4",
+      "status": "pass",
+      "marks": {
+        "dbms": {
+          "cce": [
+            7,
+            7,
+            8,
+            7,
+            8
+          ],
+          "ese": 8,
+          "tw": 8
+        },
+        "m3": {
+          "cce": [
+            7,
+            8,
+            7,
+            8,
+            7
+          ],
+          "ese": 7,
+          "tw": 7
+        }
+      }
+    }
+  ],
+  "nextStuId": 5,
+  "nextMarkId": 4,
+  "pushTime": "2026-04-04T18:02:48.669Z"
 }
