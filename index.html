@@ -4,126 +4,581 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>DBMS Result System</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#30363d;--border:#30363d;--border2:#3d444d;--text:#e6edf3;--text2:#8b949e;--text3:#6e7681;--teal:#39d353;--teal-dim:#1a6334;--blue:#58a6ff;--blue-dim:#1f3a5f;--red:#f85149;--red-dim:#5c1a1a;--amber:#d29922;--amber-dim:#3d2800;--purple:#bc8cff;--green:#3fb950;--green-dim:#1a4228;--cyan:#79c0ff;--r:8px;--rl:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;font-size:14px}
+.sb{width:200px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100}
+.sb-logo{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-ico{width:32px;height:32px;background:var(--teal);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#0d1117;font-family:'JetBrains Mono',monospace}
+.logo-txt{font-weight:600;font-size:14px;line-height:1.2}
+.logo-sub{font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace}
+.sb-nav{flex:1;padding:10px 8px}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:var(--r);cursor:pointer;color:var(--text2);font-size:13px;margin-bottom:2px;transition:.15s;border:none;background:none;width:100%;text-align:left;font-family:'Outfit',sans-serif}
+.ni:hover{background:var(--bg3);color:var(--text)}
+.ni.active{background:var(--teal);color:#0d1117;font-weight:500}
+.sb-foot{padding:12px;border-top:1px solid var(--border)}
+.gh-st{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:8px;line-height:1.5;display:flex;align-items:center;gap:5px;word-break:break-all}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--red);flex-shrink:0}
+.dot.on{background:var(--teal)}
+.btn-cfg{width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:var(--r);font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;transition:.15s}
+.btn-cfg:hover{border-color:var(--border2);color:var(--text)}
+.main{margin-left:200px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{padding:18px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.tb-left h1{font-size:22px;font-weight:600}
+.tb-left p{font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.tb-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sync-badge{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;font-size:11px;font-family:'JetBrains Mono',monospace;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.content{padding:24px 28px;flex:1}
+.btn{padding:8px 16px;border-radius:var(--r);font-size:13px;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:500;border:1px solid var(--border);transition:.15s}
+.btn-out{background:transparent;color:var(--text2)}
+.btn-out:hover{border-color:var(--border2);color:var(--text)}
+.btn-pri{background:var(--teal);color:#0d1117;border-color:var(--teal)}
+.btn-pri:hover{opacity:.9}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-del{background:transparent;border-color:var(--red-dim);color:var(--red);font-size:11px;padding:3px 9px;border-radius:var(--r);cursor:pointer;font-family:'Outfit',sans-serif;border:1px solid var(--red-dim)}
+.btn-del:hover{background:var(--red-dim)}
+.btn-grn{background:var(--green-dim);color:var(--teal);border:1px solid rgba(63,185,80,.3);font-size:12px;padding:6px 12px;border-radius:var(--r);cursor:pointer;font-family:'Outfit',sans-serif}
+.btn-grn:hover{background:#1f5230}
+.page{display:none}.page.active{display:block}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:18px 20px;position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.sc.c-blue::before{background:var(--blue)}.sc.c-teal::before{background:var(--teal)}.sc.c-red::before{background:var(--red)}.sc.c-amb::before{background:var(--amber)}
+.sc-num{font-size:34px;font-weight:600;font-family:'JetBrains Mono',monospace;line-height:1}
+.sc-num.c-blue{color:var(--blue)}.sc-num.c-teal{color:var(--teal)}.sc-num.c-red{color:var(--red)}.sc-num.c-amb{color:var(--amber)}
+.sc-lbl{font-size:10px;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;margin:6px 0 8px;font-family:'JetBrains Mono',monospace}
+.sc-sub{font-size:11px;font-family:'JetBrains Mono',monospace}
+.sc-sub.c-teal{color:var(--teal)}.sc-sub.c-red{color:var(--red)}.sc-sub.c-amb{color:var(--amber)}.sc-sub.c-blue{color:var(--blue)}
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:20px}
+.panel-title{font-size:14px;font-weight:500;margin-bottom:14px}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.qpanel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
+.qpanel-hdr{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.qpanel-hdr h2{font-size:14px;font-weight:500}
+.chart-bars{display:flex;align-items:flex-end;gap:10px;height:110px;padding-bottom:22px}
+.bg{display:flex;flex-direction:column;align-items:center;flex:1;gap:4px}
+.bar{border-radius:4px 4px 0 0;width:100%;min-height:3px}
+.bc{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text2)}
+.bl{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.pr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.pr:last-child{border-bottom:none}
+.prn{width:22px;height:22px;background:var(--bg3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--text3);font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.prn.r1{background:var(--amber-dim);color:var(--amber)}
+.pri{flex:1;min-width:0}
+.prnm{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prm{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.prs{font-size:12px;font-weight:600;color:var(--cyan);font-family:'JetBrains Mono',monospace}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:9px 11px;font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:9px 11px;border-bottom:1px solid var(--border);color:var(--text);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3)}
+.tm{font-family:'JetBrains Mono',monospace}.td2{color:var(--text2)}.tb{font-weight:600;font-family:'JetBrains Mono',monospace}
+.rk{width:26px;height:26px;background:var(--bg3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text3)}
+.badge{display:inline-block;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace}
+.bO{background:#1a4228;color:#3fb950}.bAp{background:#2d1f63;color:#bc8cff}.bA{background:#1f3a5f;color:#79c0ff}.bBp{background:#1a3a2a;color:#56d364}.bB{background:#3d2800;color:#d29922}.bC{background:#3a1a00;color:#f0883e}.bF{background:#5c1a1a;color:#f85149}
+.bpass{background:#1a4228;color:#3fb950}.bfail{background:#5c1a1a;color:#f85149}.bwith{background:#3d2800;color:#d29922}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-hdr h2{font-size:15px;font-weight:500}
+.fbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.fbar input,.fbar select{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:7px 11px;border-radius:var(--r);font-size:13px;font-family:'Outfit',sans-serif;outline:none}
+.fbar input{flex:1;min-width:180px}
+.fbar input:focus,.fbar select:focus{border-color:var(--blue)}
+.fbar select option{background:var(--bg2)}
+.tabs{display:flex;gap:2px;background:var(--bg3);border-radius:var(--r);padding:3px;margin-bottom:14px;width:fit-content;flex-wrap:wrap}
+.tab{padding:5px 11px;border-radius:6px;font-size:12px;cursor:pointer;border:none;background:none;color:var(--text2);font-family:'Outfit',sans-serif;transition:.15s;white-space:nowrap}
+.tab.active{background:var(--bg2);color:var(--text);border:1px solid var(--border)}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:16px}
+.mo.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);width:520px;max-width:100%;max-height:90vh;overflow-y:auto}
+.modal.mlg{width:700px}
+.mhdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.mhdr h2{font-size:15px;font-weight:500}
+.mclose{background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;line-height:1;padding:0 4px}
+.mclose:hover{color:var(--text)}
+.mbody{padding:20px}
+.mfoot{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;letter-spacing:.03em}
+.fg input,.fg select{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:var(--r);font-size:13px;font-family:'Outfit',sans-serif;outline:none;width:100%;transition:.15s}
+.fg input:focus,.fg select:focus{border-color:var(--blue)}
+.fg input[readonly]{background:var(--bg);color:var(--teal);font-family:'JetBrains Mono',monospace}
+.fg select option{background:var(--bg2)}
+.fdiv{font-size:12px;font-weight:500;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:7px;margin:14px 0 10px;font-family:'JetBrains Mono',monospace}
+.cce5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px}
+.rp{background:var(--bg3);border-radius:var(--r);padding:12px;margin-top:12px}
+.rp-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace}
+.rp-row:last-child{border-bottom:none;font-weight:600;font-size:13px;color:var(--teal)}
+.rpl{color:var(--text2)}
+.ibar{background:var(--blue-dim);border:1px solid rgba(88,166,255,.3);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--cyan);margin-bottom:12px;font-family:'JetBrains Mono',monospace;line-height:1.6}
+.wbar{background:var(--amber-dim);border:1px solid rgba(210,153,34,.3);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--amber);margin-bottom:12px;line-height:1.5}
+.sbar{background:var(--green-dim);border:1px solid rgba(63,185,80,.3);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--teal);margin-bottom:12px}
+.iz{border:2px dashed var(--border2);border-radius:var(--rl);padding:28px;text-align:center;cursor:pointer;transition:.2s}
+.iz:hover{border-color:var(--blue);background:var(--blue-dim)}
+.iz-txt{font-size:13px;color:var(--text2);margin-bottom:4px}
+.iz-sub{font-size:11px;color:var(--text3)}
+.exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.exp-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rl);padding:16px}
+.exp-card h3{font-size:13px;font-weight:500;margin-bottom:4px}
+.exp-card p{font-size:12px;color:var(--text2);margin-bottom:12px}
+.empty{text-align:center;padding:28px;color:var(--text3);font-size:12px;font-family:'JetBrains Mono',monospace}
+@media(max-width:860px){.sb{width:160px}.main{margin-left:160px}.stats-grid{grid-template-columns:1fr 1fr}.dash-grid{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-<aside class="sidebar">
-  <div class="sb-brand">
-    <div class="sb-icon">DB</div>
-    <div><div class="sb-title">DBMS<span class="sb-acc">RMS</span></div><div class="sb-sub">Result Management</div></div>
+
+<aside class="sb">
+  <div class="sb-logo">
+    <div class="logo-ico">DB</div>
+    <div><div class="logo-txt">DBMSRMS</div><div class="logo-sub">Result Management</div></div>
   </div>
   <nav class="sb-nav">
-    <a class="nav-it active" onclick="navigate('dashboard',this)">Dashboard</a>
-    <a class="nav-it" onclick="navigate('students',this)">Students</a>
-    <a class="nav-it" onclick="navigate('marks',this)">Marks and Grades</a>
-    <a class="nav-it" onclick="navigate('results',this)">Results and Report</a>
-    <a class="nav-it" onclick="navigate('search',this)">Search and Filter</a>
+    <button class="ni active" onclick="goPage('dashboard')"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h5v5H2zm7 0h5v5H9zM2 9h5v5H2zm7 0h5v5H9z"/></svg>Dashboard</button>
+    <button class="ni" onclick="goPage('students')"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 8a3 3 0 100-6 3 3 0 000 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3z"/></svg>Students</button>
+    <button class="ni" onclick="goPage('marks')"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M1 2h14v2H1zM1 7h10v2H1zM1 12h7v2H1z"/></svg>Marks &amp; Grades</button>
+    <button class="ni" onclick="goPage('subjects')"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v2H2zm0 4h12v2H2zm0 4h8v2H2z"/></svg>Subjects</button>
+    <button class="ni" onclick="goPage('results')"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M14 2H2a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V3a1 1 0 00-1-1zM5 12H3v-2h2zm0-4H3V6h2zm0-4H3V2h2zm8 8H6V2h7v10z"/></svg>Results &amp; Report</button>
+    <button class="ni" onclick="goPage('import')"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M7.47 11.78a.75.75 0 001.06 0l4-4a.75.75 0 00-1.06-1.06L8.75 9.44V2.75a.75.75 0 00-1.5 0v6.69L4.53 6.72a.75.75 0 00-1.06 1.06l4 4z"/><path d="M2 13.25a.75.75 0 000 1.5h12a.75.75 0 000-1.5H2z"/></svg>Import / Export</button>
   </nav>
   <div class="sb-foot">
-    <div class="gh-st"><div class="gh-dot off" id="gh-dot"></div><span id="gh-st-txt">Not Connected</span></div>
-    <button class="btn-ghc" onclick="openModal('gh-modal')">GitHub Config</button>
+    <div class="gh-st"><span class="dot" id="gh-dot"></span><span id="gh-lbl">Not Connected</span></div>
+    <button class="btn-cfg" onclick="openModal('mo-github')">GitHub Config</button>
   </div>
 </aside>
+
 <main class="main">
-  <header class="topbar">
-    <div><div class="pg-title" id="pg-title">Dashboard</div><div class="pg-bc">DBMS Result Management System</div></div>
+  <div class="topbar">
+    <div class="tb-left"><h1 id="page-title">Dashboard</h1><p>DBMS Result Management System</p></div>
     <div class="tb-right">
-      <button class="btn btn-o" onclick="pullGH()">Pull from GitHub</button>
-      <button class="btn btn-p" onclick="pushGH()">Push to GitHub</button>
+      <div class="sync-badge"><span class="dot" id="sync-dot"></span><span id="sync-lbl">Not synced</span></div>
+      <button class="btn btn-out" onclick="pullGH()">Pull from GitHub</button>
+      <button class="btn btn-pri" onclick="pushGH()">Push to GitHub</button>
     </div>
-  </header>
-  <div class="sec active" id="sec-dashboard">
-    <div class="g4" id="stats"></div>
-    <div class="g2">
-      <div class="card"><div class="card-h"><span class="card-t">Grade Distribution</span></div><div class="gb" id="grade-bars"></div></div>
-      <div class="card"><div class="card-h"><span class="card-t">Top Performers</span></div><div id="top-list"></div></div>
-    </div>
-    <div class="card mt"><div class="card-h"><span class="card-t">Quick Overview</span><button class="btn btn-sm btn-o" onclick="exportCSV()">Export CSV</button></div><div id="dash-table"></div></div>
   </div>
-  <div class="sec" id="sec-students">
-    <div class="sec-act"><button class="btn btn-p" onclick="openStudentModal()">Add Student</button></div>
-    <div class="card"><div class="card-h"><span class="card-t">Student Records</span><input type="text" placeholder="Search..." oninput="renderStudents(this.value)" style="background:#1c2340;border:1px solid rgba(99,130,200,0.22);color:#dde2f4;border-radius:8px;padding:6px 12px;font-size:13px;outline:none;width:200px"/></div><div id="stu-table"></div></div>
-  </div>
-  <div class="sec" id="sec-marks">
-    <div class="sec-act"><button class="btn btn-p" onclick="openMarksModal()">Add Marks</button></div>
-    <div class="card"><div class="card-h"><span class="card-t">Marks and Grades</span><select class="ssl" onchange="renderMarks(this.value)" style="background:#1c2340;border:1px solid rgba(99,130,200,0.22);color:#dde2f4;border-radius:8px;padding:6px 10px;font-size:12px;outline:none"><option value="">All Exams</option><option>Unit Test I</option><option>Unit Test II</option><option>Unit Test III</option><option>Unit Test IV</option><option>Semester End</option></select></div><div id="marks-table"></div></div>
-  </div>
-  <div class="sec" id="sec-results">
-    <div class="g3 mt" id="res-stats"></div>
-    <div class="card mt"><div class="card-h"><span class="card-t">Result Report</span><div style="display:flex;gap:8px"><button class="btn btn-sm btn-o" onclick="exportCSV()">CSV</button><button class="btn btn-sm btn-o" onclick="window.print()">Print</button></div></div><div id="res-table"></div></div>
-    <div class="card mt"><div class="card-h"><span class="card-t">Score Distribution</span></div><div class="bc" id="score-chart"></div></div>
-  </div>
-  <div class="sec" id="sec-search">
-    <div class="card" style="border-radius:14px;overflow:hidden;margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:14px;padding:20px 22px;border-bottom:1px solid rgba(99,130,200,0.12);color:#6b739e">
-        <span style="font-size:20px">&#128269;</span>
-        <input style="flex:1;background:transparent;border:none;color:#dde2f4;font-size:18px;font-family:IBM Plex Sans,sans-serif;outline:none" id="big-search" placeholder="Search by name, roll or grade..." oninput="doSearch(this.value)"/>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid" id="dash-stats"></div>
+      <div class="dash-grid">
+        <div class="panel"><div class="panel-title">Grade Distribution</div><div class="chart-bars" id="grade-chart"></div></div>
+        <div class="panel"><div class="panel-title">Top Performers</div><div id="top-perf"></div></div>
       </div>
-      <div style="display:flex;gap:10px;padding:14px 22px;flex-wrap:wrap">
-        <select onchange="doSearch(document.getElementById('big-search').value)" id="sf-exam" style="background:#1c2340;border:1px solid rgba(99,130,200,0.22);color:#dde2f4;border-radius:8px;padding:6px 10px;font-size:12px;outline:none;flex:1;min-width:120px"><option value="">All Exams</option><option>Unit Test I</option><option>Unit Test II</option><option>Unit Test III</option><option>Unit Test IV</option><option>Semester End</option></select>
-        <select onchange="doSearch(document.getElementById('big-search').value)" id="sf-div" style="background:#1c2340;border:1px solid rgba(99,130,200,0.22);color:#dde2f4;border-radius:8px;padding:6px 10px;font-size:12px;outline:none;flex:1;min-width:120px"><option value="">All Divisions</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
-        <select onchange="doSearch(document.getElementById('big-search').value)" id="sf-st" style="background:#1c2340;border:1px solid rgba(99,130,200,0.22);color:#dde2f4;border-radius:8px;padding:6px 10px;font-size:12px;outline:none;flex:1;min-width:120px"><option value="">All Status</option><option>Pass</option><option>Fail</option><option>Withheld</option></select>
-        <select onchange="doSearch(document.getElementById('big-search').value)" id="sf-gr" style="background:#1c2340;border:1px solid rgba(99,130,200,0.22);color:#dde2f4;border-radius:8px;padding:6px 10px;font-size:12px;outline:none;flex:1;min-width:120px"><option value="">All Grades</option><option>O</option><option>A+</option><option>A</option><option>B+</option><option>B</option><option>C</option><option>F</option></select>
+      <div class="qpanel">
+        <div class="qpanel-hdr"><h2>Quick Overview</h2><button class="btn btn-out btn-sm" onclick="exportCSV()">Export CSV</button></div>
+        <div class="tw"><table><thead><tr><th>#</th><th>ROLL</th><th>NAME</th><th>TERM</th><th>CCE TOTAL</th><th>ESE</th><th>TW</th><th>TOTAL</th><th>%</th><th>GRADE</th><th>STATUS</th></tr></thead><tbody id="dash-tbody"></tbody></table></div>
       </div>
     </div>
-    <div class="card"><div class="card-h"><span class="card-t">Results</span><span id="s-count" style="font-size:11px;font-family:IBM Plex Mono,monospace;color:#6b739e"></span></div><div id="s-results"></div></div>
+
+    <!-- STUDENTS -->
+    <div class="page" id="page-students">
+      <div class="sec-hdr"><h2>Student Records</h2><button class="btn btn-pri btn-sm" onclick="openModal('mo-student')">+ Add Student</button></div>
+      <div class="fbar">
+        <input type="text" placeholder="Search by name, roll, PRN..." oninput="renderStudents(this.value)" id="stu-q"/>
+        <select onchange="renderStudents(document.getElementById('stu-q').value)" id="stu-div"><option value="">All Divisions</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+      </div>
+      <div class="qpanel"><div class="tw"><table><thead><tr><th>#</th><th>ROLL</th><th>NAME</th><th>DIV</th><th>PRN</th><th>EMAIL</th><th>PHONE</th><th>ACTION</th></tr></thead><tbody id="stu-tbody"></tbody></table></div></div>
+    </div>
+
+    <!-- MARKS -->
+    <div class="page" id="page-marks">
+      <div class="sec-hdr"><h2>Marks &amp; Grades</h2><button class="btn btn-pri btn-sm" onclick="openModal('mo-marks')">+ Add Marks</button></div>
+      <div class="tabs" id="exam-tabs"></div>
+      <div class="qpanel"><div class="tw"><table><thead><tr><th>#</th><th>ROLL</th><th>NAME</th><th>TERM</th><th>CCE TOTAL</th><th>ESE</th><th>TW</th><th>TOTAL</th><th>%</th><th>GRADE</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="marks-tbody"></tbody></table></div></div>
+    </div>
+
+    <!-- SUBJECTS -->
+    <div class="page" id="page-subjects">
+      <div class="sec-hdr"><h2>Subject Management</h2></div>
+      <div class="ibar">Each subject: 5 CCE tests (8 marks each = 40) + ESE Exam (60 marks) + Term Work / Assignment (25 marks) = <strong>125 marks per subject</strong></div>
+      <div class="panel" style="margin-bottom:14px">
+        <div class="fr" style="margin-bottom:0">
+          <div class="fg"><label>Subject Name</label><input type="text" id="sub-name" placeholder="e.g. Database Management Systems"/></div>
+          <div class="fg"><label>Subject Code (optional)</label><input type="text" id="sub-code" placeholder="e.g. DBMS301"/></div>
+        </div>
+        <div style="margin-top:10px"><button class="btn btn-pri btn-sm" onclick="addSubject()">Add Subject</button></div>
+      </div>
+      <div class="qpanel"><div class="tw"><table><thead><tr><th>#</th><th>SUBJECT NAME</th><th>CODE</th><th>CCE (5x8)</th><th>ESE</th><th>TERM WORK</th><th>TOTAL</th><th>ACTION</th></tr></thead><tbody id="sub-tbody"></tbody></table></div></div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="page" id="page-results">
+      <div class="sec-hdr"><h2>Result Report</h2><div style="display:flex;gap:8px"><button class="btn btn-out btn-sm" onclick="exportCSV()">CSV</button><button class="btn btn-out btn-sm" onclick="window.print()">Print</button></div></div>
+      <div class="fbar">
+        <input type="text" id="res-q" placeholder="Search..." oninput="renderResults()"/>
+        <select id="res-term" onchange="renderResults()"><option value="">All Terms</option><option>Semester I</option><option>Semester II</option><option>Semester III</option><option>Semester IV</option><option>Semester V</option><option>Semester VI</option><option>Semester VII</option><option>Semester VIII</option></select>
+        <select id="res-div" onchange="renderResults()"><option value="">All Divisions</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+        <select id="res-status" onchange="renderResults()"><option value="">All Status</option><option>Pass</option><option>Fail</option><option>Withheld</option></select>
+        <select id="res-grade" onchange="renderResults()"><option value="">All Grades</option><option>O</option><option>A+</option><option>A</option><option>B+</option><option>B</option><option>C</option><option>F</option></select>
+      </div>
+      <div class="qpanel"><div class="tw"><table><thead><tr><th>#</th><th>ROLL</th><th>NAME</th><th>TERM</th><th>CCE TOTAL</th><th>ESE</th><th>TW</th><th>TOTAL</th><th>%</th><th>GRADE</th><th>STATUS</th></tr></thead><tbody id="res-tbody"></tbody></table></div></div>
+    </div>
+
+    <!-- IMPORT/EXPORT -->
+    <div class="page" id="page-import">
+      <div class="sec-hdr"><h2>Import / Export</h2></div>
+      <div class="panel" style="margin-bottom:14px">
+        <div class="panel-title">Import from Excel / CSV</div>
+        <div class="ibar">Columns needed: Name, Roll, Division, PRN, Term, Status — then for each subject:<br/>SubjectName_CCE1 to CCE5 | SubjectName_ESE | SubjectName_TW</div>
+        <div class="iz" onclick="document.getElementById('file-inp').click()">
+          <div class="iz-txt" style="font-size:22px;margin-bottom:6px;opacity:.5">&#8679;</div>
+          <div class="iz-txt">Click to upload CSV file</div>
+          <div class="iz-sub">Save Excel as CSV first: File &rarr; Save As &rarr; CSV UTF-8</div>
+          <input type="file" id="file-inp" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleImport(this)"/>
+        </div>
+        <div id="import-res"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Export Data</div>
+        <div class="exp-grid">
+          <div class="exp-card"><h3>Export All Results</h3><p>Complete CCE, ESE, TW breakdown for all students</p><button class="btn-grn" onclick="exportCSV()">Download CSV</button></div>
+          <div class="exp-card"><h3>Download Template</h3><p>Blank CSV with correct columns for your subjects — fill in Excel and import back</p><button class="btn-grn" onclick="exportTemplate()">Download Template</button></div>
+          <div class="exp-card"><h3>Export Students List</h3><p>Student records only (no marks)</p><button class="btn-grn" onclick="exportStudents()">Download Students CSV</button></div>
+          <div class="exp-card"><h3>Export Subjects</h3><p>Current subject list and mark structure</p><button class="btn-grn" onclick="exportSubjects()">Download Subjects CSV</button></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </main>
-<div class="modal-overlay" id="stu-modal" onclick="if(event.target===this)closeModal('stu-modal')">
+
+<!-- MODAL: ADD STUDENT -->
+<div class="mo" id="mo-student">
   <div class="modal">
-    <div class="modal-h"><span id="stu-modal-title">Add Student</span><button class="modal-x" onclick="closeModal('stu-modal')">X</button></div>
-    <div class="modal-b">
-      <input type="hidden" id="s-eid"/>
-      <div class="fg">
-        <div class="fgp"><label>Roll Number</label><input id="s-roll" placeholder="e.g. 22CS101"/></div>
-        <div class="fgp"><label>Full Name</label><input id="s-name" placeholder="e.g. Priya Joshi"/></div>
-        <div class="fgp"><label>Division</label><select id="s-div"><option>A</option><option>B</option><option>C</option><option>D</option></select></div>
-        <div class="fgp"><label>Email</label><input id="s-email" placeholder="student@college.edu"/></div>
-        <div class="fgp"><label>Phone</label><input id="s-phone" placeholder="+91 XXXXX XXXXX"/></div>
-        <div class="fgp"><label>PRN</label><input id="s-prn" placeholder="PRN number"/></div>
-      </div>
+    <div class="mhdr"><h2>Add Student</h2><button class="mclose" onclick="closeModal('mo-student')">&#215;</button></div>
+    <div class="mbody">
+      <div class="fr"><div class="fg"><label>Roll Number</label><input type="text" id="s-roll" placeholder="e.g. 22CS101"/></div><div class="fg"><label>Full Name</label><input type="text" id="s-name" placeholder="Full name"/></div></div>
+      <div class="fr"><div class="fg"><label>Division</label><select id="s-div"><option>A</option><option>B</option><option>C</option><option>D</option></select></div><div class="fg"><label>PRN</label><input type="text" id="s-prn" placeholder="PRN number"/></div></div>
+      <div class="fr"><div class="fg"><label>Email</label><input type="email" id="s-email" placeholder="student@example.com"/></div><div class="fg"><label>Phone</label><input type="text" id="s-phone" placeholder="10-digit phone"/></div></div>
     </div>
-    <div class="modal-f"><button class="btn btn-o" onclick="closeModal('stu-modal')">Cancel</button><button class="btn btn-p" onclick="saveStudent()">Save Student</button></div>
+    <div class="mfoot"><button class="btn btn-out btn-sm" onclick="closeModal('mo-student')">Cancel</button><button class="btn btn-pri btn-sm" onclick="saveStudent()">Save Student</button></div>
   </div>
 </div>
-<div class="modal-overlay" id="mrk-modal" onclick="if(event.target===this)closeModal('mrk-modal')">
-  <div class="modal">
-    <div class="modal-h"><span id="mrk-modal-title">Add Marks</span><button class="modal-x" onclick="closeModal('mrk-modal')">X</button></div>
-    <div class="modal-b">
-      <input type="hidden" id="m-eid"/>
-      <div class="fg">
-        <div class="fgp" style="grid-column:1/-1"><label>Student</label><select id="m-stu"></select></div>
-        <div class="fgp"><label>Exam</label><select id="m-exam"><option>Unit Test I</option><option>Unit Test II</option><option>Unit Test III</option><option selected>Unit Test IV</option><option>Semester End</option></select></div>
-        <div class="fgp"><label>Status</label><select id="m-st"><option>Pass</option><option>Fail</option><option>Withheld</option></select></div>
-        <div class="fgp"><label>Practical max 25</label><input id="m-pr" type="number" min="0" max="25" oninput="livePreview()"/></div>
-        <div class="fgp"><label>Internal max 25</label><input id="m-in" type="number" min="0" max="25" oninput="livePreview()"/></div>
-        <div class="fgp"><label>Theory max 50</label><input id="m-th" type="number" min="0" max="50" oninput="livePreview()"/></div>
+
+<!-- MODAL: ADD MARKS -->
+<div class="mo" id="mo-marks">
+  <div class="modal mlg">
+    <div class="mhdr"><h2>Add / Edit Marks</h2><button class="mclose" onclick="closeModal('mo-marks')">&#215;</button></div>
+    <div class="mbody">
+      <div class="fr">
+        <div class="fg"><label>Student</label><select id="m-stu"><option value="">Select student...</option></select></div>
+        <div class="fg"><label>Term / Semester</label><select id="m-term"><option>Semester I</option><option>Semester II</option><option>Semester III</option><option>Semester IV</option><option>Semester V</option><option>Semester VI</option><option>Semester VII</option><option>Semester VIII</option></select></div>
       </div>
-      <div style="margin-top:16px;display:flex;gap:24px;padding:12px 16px;background:#1c2340;border-radius:8px;font-size:12px;color:#6b739e">
-        <span>Total: <strong id="pv-tot" style="color:#00e5ff;font-family:IBM Plex Mono,monospace">0</strong></span>
-        <span>Percentage: <strong id="pv-pct" style="color:#00e5ff;font-family:IBM Plex Mono,monospace">0%</strong></span>
-        <span>Grade: <strong id="pv-gr" style="color:#00e5ff;font-family:IBM Plex Mono,monospace">F</strong></span>
+      <div class="fg" style="margin-bottom:12px"><label>Result Status</label><select id="m-status"><option>Pass</option><option>Fail</option><option>Withheld</option></select></div>
+      <div style="background:var(--bg3);border-radius:var(--r);padding:9px 12px;margin-bottom:12px;font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace">
+        CCE 1-5: max 8 each (5x8 = 40 total) &nbsp;+&nbsp; ESE Exam: max 60 &nbsp;+&nbsp; Term Work: max 25 &nbsp;= &nbsp;<span style="color:var(--teal)">125 marks per subject</span>
       </div>
+      <div id="marks-form"></div>
+      <div id="marks-prev" class="rp" style="display:none"></div>
     </div>
-    <div class="modal-f"><button class="btn btn-o" onclick="closeModal('mrk-modal')">Cancel</button><button class="btn btn-p" onclick="saveMarks()">Save Marks</button></div>
+    <div class="mfoot"><button class="btn btn-out btn-sm" onclick="closeModal('mo-marks')">Cancel</button><button class="btn btn-pri btn-sm" onclick="saveMarks()">Save Marks</button></div>
   </div>
 </div>
-<div class="modal-overlay" id="gh-modal" onclick="if(event.target===this)closeModal('gh-modal')">
+
+<!-- MODAL: GITHUB CONFIG -->
+<div class="mo" id="mo-github">
   <div class="modal">
-    <div class="modal-h"><span>GitHub Config</span><button class="modal-x" onclick="closeModal('gh-modal')">X</button></div>
-    <div class="modal-b">
-      <div class="fg">
-        <div class="fgp" style="grid-column:1/-1"><label>Personal Access Token</label><input id="gh-tok" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"/></div>
-        <div class="fgp"><label>GitHub Username</label><input id="gh-own" placeholder="nakulgodse1307-ai"/></div>
-        <div class="fgp"><label>Repository Name</label><input id="gh-rep" placeholder="dbms-result-system"/></div>
-        <div class="fgp" style="grid-column:1/-1"><label>Branch</label><input id="gh-br" value="main"/></div>
-      </div>
+    <div class="mhdr"><h2>GitHub Config</h2><button class="mclose" onclick="closeModal('mo-github')">&#215;</button></div>
+    <div class="mbody">
+      <div class="ibar">Token stored in your browser only. Data saved as data.json in repo — students Pull to get latest data.</div>
+      <div class="fg" style="margin-bottom:10px"><label>Personal Access Token (classic, repo scope)</label><input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"/></div>
+      <div class="fr"><div class="fg"><label>GitHub Username</label><input type="text" id="gh-user" placeholder="nakulgodse1307-ai"/></div><div class="fg"><label>Repository Name</label><input type="text" id="gh-repo" placeholder="dbms-result-system"/></div></div>
+      <div class="fg" style="margin-bottom:10px"><label>Branch</label><input type="text" id="gh-branch" value="main"/></div>
+      <div id="gh-result"></div>
     </div>
-    <div class="modal-f"><button class="btn btn-o" onclick="closeModal('gh-modal')">Cancel</button><button class="btn btn-p" onclick="saveGHConfig()">Connect and Test</button></div>
+    <div class="mfoot"><button class="btn btn-out btn-sm" onclick="closeModal('mo-github')">Cancel</button><button class="btn btn-pri btn-sm" onclick="saveGHConfig()">Connect &amp; Test</button></div>
   </div>
 </div>
-<div class="toast" id="toast"></div>
-<script src="app.js"></script>
+
+<script>
+var subjects=[{name:"Mathematics",code:"MATH301"},{name:"Science",code:"SCI301"},{name:"English",code:"ENG301"},{name:"Hindi",code:"HIN301"},{name:"Computer",code:"CS301"}];
+var students=[];
+var marksData=[];
+var nextStuId=1;
+var nextMarkId=1;
+var activeTab='';
+var TERMS=["Semester I","Semester II","Semester III","Semester IV","Semester V","Semester VI","Semester VII","Semester VIII"];
+var CCE_N=5,CCE_MAX=8,ESE_MAX=60,TW_MAX=25,SUB_TOT=125;
+
+function sid(n){return n.replace(/[^a-zA-Z0-9]/g,'_');}
+function gv(id){var e=document.getElementById(id);return e?parseInt(e.value)||0:0;}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function calcCCE(m){return(m.cce||[]).reduce(function(a,v){return a+(parseInt(v)||0);},0);}
+function calcSub(m){return calcCCE(m)+(parseInt(m.ese)||0)+(parseInt(m.tw)||0);}
+function calcRow(row){
+  var cce=0,ese=0,tw=0;
+  subjects.forEach(function(sub){var m=row.marks&&row.marks[sub.name];if(m){cce+=calcCCE(m);ese+=parseInt(m.ese)||0;tw+=parseInt(m.tw)||0;}});
+  var tot=cce+ese+tw,mx=subjects.length*SUB_TOT;
+  return{cce:cce,ese:ese,tw:tw,total:tot,max:mx,pct:mx?Math.round(tot/mx*100):0};
+}
+function grade(p){if(p>=90)return'O';if(p>=80)return'A+';if(p>=70)return'A';if(p>=60)return'B+';if(p>=50)return'B';if(p>=45)return'C';return'F';}
+function gbc(g){return{O:'bO','A+':'bAp','A':'bA','B+':'bBp','B':'bB','C':'bC','F':'bF'}[g]||'bF';}
+function sbadge(s){return'<span class="badge '+({Pass:'bpass',Fail:'bfail',Withheld:'bwith'}[s]||'bfail')+'">'+esc(s)+'</span>';}
+
+function goPage(name){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});
+  var pg=document.getElementById('page-'+name);if(pg)pg.classList.add('active');
+  document.querySelectorAll('.ni').forEach(function(n){if((n.getAttribute('onclick')||'').indexOf("'"+name+"'")>-1)n.classList.add('active');});
+  var t=document.getElementById('page-title');if(t)t.textContent={dashboard:'Dashboard',students:'Students',marks:'Marks and Grades',subjects:'Subjects',results:'Results and Report',import:'Import / Export'}[name]||name;
+  if(name==='dashboard')renderDash();
+  if(name==='students')renderStudents('');
+  if(name==='marks')renderMarks();
+  if(name==='subjects')renderSubjects();
+  if(name==='results')renderResults();
+}
+
+function openModal(id){var e=document.getElementById(id);if(e)e.classList.add('open');if(id==='mo-marks')buildMarksForm();if(id==='mo-github')loadGHConfig();}
+function closeModal(id){var e=document.getElementById(id);if(e)e.classList.remove('open');}
+document.querySelectorAll('.mo').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)o.classList.remove('open');});});
+
+function renderDash(){
+  var tot=students.length,pass=marksData.filter(function(m){return m.status==='Pass';}).length,fail=marksData.filter(function(m){return m.status==='Fail';}).length;
+  var pcts=marksData.map(function(m){return calcRow(m).pct;});
+  var avg=pcts.length?Math.round(pcts.reduce(function(a,v){return a+v;},0)/pcts.length):0;
+  var el=document.getElementById('dash-stats');
+  if(el)el.innerHTML='<div class="sc c-blue"><div class="sc-num c-blue">'+tot+'</div><div class="sc-lbl">Total Students</div><div class="sc-sub c-blue" style="font-size:11px;font-family:JetBrains Mono,monospace">Batch 2022-26</div></div>'+
+    '<div class="sc c-teal"><div class="sc-num c-teal">'+pass+'</div><div class="sc-lbl">Passed</div><div class="sc-sub c-teal">'+(marksData.length?Math.round(pass/marksData.length*100):0)+'% pass rate</div></div>'+
+    '<div class="sc c-red"><div class="sc-num c-red">'+fail+'</div><div class="sc-lbl">Failed</div><div class="sc-sub c-red">'+(marksData.length?Math.round(fail/marksData.length*100):0)+'% fail rate</div></div>'+
+    '<div class="sc c-amb"><div class="sc-num c-amb">'+avg+'%</div><div class="sc-lbl">Class Average</div><div class="sc-sub c-amb">'+grade(avg)+' grade avg</div></div>';
+  var grades=['O','A+','A','B+','B','C','F'],colors=['#3fb950','#bc8cff','#58a6ff','#56d364','#d29922','#f0883e','#f85149'];
+  var counts=grades.map(function(g){return marksData.filter(function(m){return grade(calcRow(m).pct)===g;}).length;});
+  var maxC=Math.max.apply(null,counts.concat([1]));
+  var gc=document.getElementById('grade-chart');
+  if(gc)gc.innerHTML=grades.map(function(g,i){return'<div class="bg"><div class="bc" style="color:'+colors[i]+'">'+counts[i]+'</div><div class="bar" style="background:'+colors[i]+';height:'+(Math.round(counts[i]/maxC*80)+4)+'px"></div><div class="bl">'+g+'</div></div>';}).join('');
+  var sorted=marksData.slice().sort(function(a,b){return calcRow(b).pct-calcRow(a).pct;}).slice(0,5);
+  var tp=document.getElementById('top-perf');
+  if(tp)tp.innerHTML=sorted.length?sorted.map(function(m,i){var stu=students.find(function(s){return s.id===m.studentId;})||{name:'?',roll:'?'};var r=calcRow(m);return'<div class="pr"><div class="prn'+(i===0?' r1':'')+'>'+(i+1)+'</div><div class="pri"><div class="prnm">'+esc(stu.name)+'</div><div class="prm">'+esc(stu.roll)+' &middot; '+esc(m.term)+'</div></div><span class="prs">'+r.total+'/'+r.max+'</span>&nbsp;<span class="badge '+gbc(grade(r.pct))+'">'+grade(r.pct)+'</span></div>';}).join(''):'<div class="empty">No marks data yet</div>';
+  var rows=marksData.slice().sort(function(a,b){return calcRow(b).pct-calcRow(a).pct;});
+  var dt=document.getElementById('dash-tbody');
+  if(dt)dt.innerHTML=rows.length?rows.map(function(m,i){var stu=students.find(function(s){return s.id===m.studentId;})||{name:'?',roll:'?'};var r=calcRow(m);var g=grade(r.pct);return'<tr><td><div class="rk">'+(i+1)+'</div></td><td class="tm td2">'+esc(stu.roll)+'</td><td style="font-weight:500">'+esc(stu.name)+'</td><td class="td2">'+esc(m.term)+'</td><td class="tm">'+r.cce+'</td><td class="tm">'+r.ese+'</td><td class="tm">'+r.tw+'</td><td class="tb">'+r.total+'</td><td class="tm">'+r.pct+'%</td><td><span class="badge '+gbc(g)+'">'+g+'</span></td><td>'+sbadge(m.status)+'</td></tr>';}).join(''):'<tr><td colspan="11" class="empty">No data yet &mdash; add students and marks to get started</td></tr>';
+}
+
+function renderStudents(q){
+  q=(q||'').toLowerCase();
+  var dv=(document.getElementById('stu-div')&&document.getElementById('stu-div').value)||'';
+  var f=students.filter(function(s){return(!q||(s.name||'').toLowerCase().indexOf(q)>-1||(s.roll||'').toLowerCase().indexOf(q)>-1||(s.prn||'').toLowerCase().indexOf(q)>-1)&&(!dv||s.div===dv);});
+  var tb=document.getElementById('stu-tbody');
+  if(tb)tb.innerHTML=f.length?f.map(function(s,i){return'<tr><td>'+(i+1)+'</td><td class="tm td2">'+esc(s.roll)+'</td><td style="font-weight:500">'+esc(s.name)+'</td><td class="tm">'+esc(s.div)+'</td><td class="tm td2">'+esc(s.prn||'-')+'</td><td class="td2">'+esc(s.email||'-')+'</td><td class="tm td2">'+esc(s.phone||'-')+'</td><td><button class="btn-del" onclick="delStu('+s.id+')">Remove</button></td></tr>';}).join(''):'<tr><td colspan="8" class="empty">No students found</td></tr>';
+}
+function saveStudent(){
+  var roll=(document.getElementById('s-roll').value||'').trim(),name=(document.getElementById('s-name').value||'').trim();
+  if(!roll||!name){alert('Roll number and name are required.');return;}
+  students.push({id:nextStuId++,roll:roll,name:name,div:document.getElementById('s-div').value,prn:document.getElementById('s-prn').value||'',email:document.getElementById('s-email').value||'',phone:document.getElementById('s-phone').value||''});
+  ['s-roll','s-name','s-prn','s-email','s-phone'].forEach(function(id){document.getElementById(id).value='';});
+  closeModal('mo-student');renderStudents('');
+}
+function delStu(id){if(!confirm('Remove this student and their marks?'))return;students=students.filter(function(s){return s.id!==id;});marksData=marksData.filter(function(m){return m.studentId!==id;});renderStudents('');}
+
+function renderSubjects(){
+  var tb=document.getElementById('sub-tbody');
+  if(tb)tb.innerHTML=subjects.length?subjects.map(function(s,i){return'<tr><td>'+(i+1)+'</td><td style="font-weight:500">'+esc(s.name)+'</td><td class="tm td2">'+esc(s.code||'-')+'</td><td class="tm">40 (5&times;8)</td><td class="tm">60</td><td class="tm">25</td><td class="tb">125</td><td><button class="btn-del" onclick="delSub('+i+')">Remove</button></td></tr>';}).join(''):'<tr><td colspan="8" class="empty">No subjects added yet</td></tr>';
+}
+function addSubject(){
+  var name=(document.getElementById('sub-name').value||'').trim();
+  if(!name){alert('Enter a subject name.');return;}
+  if(subjects.find(function(s){return s.name===name;})){alert('Subject already exists.');return;}
+  subjects.push({name:name,code:(document.getElementById('sub-code').value||'').trim()});
+  document.getElementById('sub-name').value='';document.getElementById('sub-code').value='';
+  renderSubjects();
+}
+function delSub(i){if(!confirm('Remove subject? Existing marks for this subject will be affected.'))return;subjects.splice(i,1);renderSubjects();}
+
+function buildMarksForm(){
+  var sel=document.getElementById('m-stu');
+  if(sel)sel.innerHTML='<option value="">Select student...</option>'+students.map(function(s){return'<option value="'+s.id+'">'+esc(s.name)+' ('+esc(s.roll)+')</option>';}).join('');
+  var form=document.getElementById('marks-form');if(!form)return;
+  if(!subjects.length){form.innerHTML='<div class="wbar">No subjects found. Add subjects from the Subjects page first.</div>';return;}
+  form.innerHTML=subjects.map(function(sub){
+    var id=sid(sub.name);
+    return'<div class="fdiv">'+esc(sub.name)+(sub.code?' ('+esc(sub.code)+')':'')+' &mdash; /125</div>'+
+      '<div style="font-size:10px;color:var(--text3);font-family:JetBrains Mono,monospace;margin-bottom:8px">5 CCE tests &times; 8 marks each = 40 total</div>'+
+      '<div class="cce5">'+[1,2,3,4,5].map(function(n){return'<div class="fg"><label>CCE '+n+' /8</label><input type="number" min="0" max="8" id="mk_'+id+'_c'+n+'" placeholder="0" oninput="updPrev()"/></div>';}).join('')+'</div>'+
+      '<div class="fr3"><div class="fg"><label>ESE Exam /60</label><input type="number" min="0" max="60" id="mk_'+id+'_ese" placeholder="0" oninput="updPrev()"/></div>'+
+      '<div class="fg"><label>Term Work /25</label><input type="number" min="0" max="25" id="mk_'+id+'_tw" placeholder="0" oninput="updPrev()"/></div>'+
+      '<div class="fg"><label>Sub Total /125</label><input type="number" id="mk_'+id+'_tot" readonly placeholder="Auto"/></div></div>';
+  }).join('');
+  var prev=document.getElementById('marks-prev');if(prev)prev.style.display='none';
+}
+function updPrev(){
+  var grand=0,mx=subjects.length*SUB_TOT;
+  subjects.forEach(function(sub){
+    var id=sid(sub.name);
+    var cce=[1,2,3,4,5].reduce(function(a,n){return a+gv('mk_'+id+'_c'+n);},0);
+    var ese=gv('mk_'+id+'_ese'),tw=gv('mk_'+id+'_tw'),tot=cce+ese+tw;
+    var el=document.getElementById('mk_'+id+'_tot');if(el)el.value=tot||'';
+    grand+=tot;
+  });
+  var p=mx?Math.round(grand/mx*100):0,g=grade(p);
+  var prev=document.getElementById('marks-prev');if(!prev)return;
+  if(!grand){prev.style.display='none';return;}
+  prev.style.display='';
+  prev.innerHTML=subjects.map(function(sub){
+    var id=sid(sub.name);
+    var cce=[1,2,3,4,5].reduce(function(a,n){return a+gv('mk_'+id+'_c'+n);},0);
+    var ese=gv('mk_'+id+'_ese'),tw=gv('mk_'+id+'_tw');
+    return'<div class="rp-row"><span class="rpl">'+esc(sub.name)+'</span><span>CCE:'+cce+'/40 &nbsp; ESE:'+ese+'/60 &nbsp; TW:'+tw+'/25 &nbsp;= <strong>'+(cce+ese+tw)+'/125</strong></span></div>';
+  }).join('')+'<div class="rp-row"><span class="rpl">Grand Total</span><span>'+grand+'/'+mx+' &mdash; '+p+'% &mdash; <span class="badge '+gbc(g)+'">'+g+'</span></span></div>';
+}
+function saveMarks(){
+  var stuId=parseInt(document.getElementById('m-stu').value);
+  if(!stuId){alert('Please select a student.');return;}
+  var term=document.getElementById('m-term').value,status=document.getElementById('m-status').value,marks={};
+  subjects.forEach(function(sub){var id=sid(sub.name);marks[sub.name]={cce:[1,2,3,4,5].map(function(n){return gv('mk_'+id+'_c'+n);}),ese:gv('mk_'+id+'_ese'),tw:gv('mk_'+id+'_tw')};});
+  var ei=marksData.findIndex(function(m){return m.studentId===stuId&&m.term===term;});
+  if(ei>=0){marksData[ei]=Object.assign({},marksData[ei],{marks:marks,status:status});}
+  else{marksData.push({id:nextMarkId++,studentId:stuId,term:term,status:status,marks:marks});}
+  closeModal('mo-marks');renderMarks();updTabs();
+}
+
+function updTabs(){
+  var el=document.getElementById('exam-tabs');if(!el)return;
+  el.innerHTML=[''].concat(TERMS).map(function(t){return'<button class="tab'+(activeTab===t?' active':'')+'" onclick="setTab(\''+t+'\')">'+(t||'All Terms')+'</button>';}).join('');
+}
+function setTab(t){activeTab=t;updTabs();renderMarks();}
+function renderMarks(){
+  updTabs();
+  var f=activeTab?marksData.filter(function(m){return m.term===activeTab;}):marksData;
+  var tb=document.getElementById('marks-tbody');
+  if(tb)tb.innerHTML=f.length?f.map(function(m,i){var stu=students.find(function(s){return s.id===m.studentId;})||{name:'?',roll:'?'};var r=calcRow(m);var g=grade(r.pct);return'<tr><td>'+(i+1)+'</td><td class="tm td2">'+esc(stu.roll)+'</td><td style="font-weight:500">'+esc(stu.name)+'</td><td class="td2">'+esc(m.term)+'</td><td class="tm">'+r.cce+'</td><td class="tm">'+r.ese+'</td><td class="tm">'+r.tw+'</td><td class="tb">'+r.total+'</td><td class="tm">'+r.pct+'%</td><td><span class="badge '+gbc(g)+'">'+g+'</span></td><td>'+sbadge(m.status)+'</td><td><button class="btn-del" onclick="delMark('+m.id+')">Remove</button></td></tr>';}).join(''):'<tr><td colspan="12" class="empty">No marks data</td></tr>';
+}
+function delMark(id){marksData=marksData.filter(function(m){return m.id!==id;});renderMarks();}
+
+function renderResults(){
+  var q=(document.getElementById('res-q')&&document.getElementById('res-q').value||'').toLowerCase();
+  var term=(document.getElementById('res-term')&&document.getElementById('res-term').value)||'';
+  var div=(document.getElementById('res-div')&&document.getElementById('res-div').value)||'';
+  var status=(document.getElementById('res-status')&&document.getElementById('res-status').value)||'';
+  var gr=(document.getElementById('res-grade')&&document.getElementById('res-grade').value)||'';
+  var f=marksData.filter(function(m){var stu=students.find(function(s){return s.id===m.studentId;})||{};var r=calcRow(m);var g=grade(r.pct);return(!q||(stu.name||'').toLowerCase().indexOf(q)>-1||(stu.roll||'').toLowerCase().indexOf(q)>-1)&&(!term||m.term===term)&&(!div||stu.div===div)&&(!status||m.status===status)&&(!gr||g===gr);});
+  var tb=document.getElementById('res-tbody');
+  if(tb)tb.innerHTML=f.length?f.map(function(m,i){var stu=students.find(function(s){return s.id===m.studentId;})||{name:'?',roll:'?'};var r=calcRow(m);var g=grade(r.pct);return'<tr><td>'+(i+1)+'</td><td class="tm td2">'+esc(stu.roll)+'</td><td style="font-weight:500">'+esc(stu.name)+'</td><td class="td2">'+esc(m.term)+'</td><td class="tm">'+r.cce+'</td><td class="tm">'+r.ese+'</td><td class="tm">'+r.tw+'</td><td class="tb">'+r.total+'</td><td class="tm">'+r.pct+'%</td><td><span class="badge '+gbc(g)+'">'+g+'</span></td><td>'+sbadge(m.status)+'</td></tr>';}).join(''):'<tr><td colspan="11" class="empty">No results match filters</td></tr>';
+}
+
+function dl(rows,filename){
+  try{
+    var csv=rows.map(function(r){return r.map(function(v){return'"'+String(v).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+    var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');a.href=url;a.download=filename;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1500);
+  }catch(e){alert('Download error: '+e.message);}
+}
+function exportCSV(){
+  if(!marksData.length){alert('No marks data to export yet.\nAdd student marks first.');return;}
+  var cHdrs=[];subjects.forEach(function(sub){[1,2,3,4,5].forEach(function(n){cHdrs.push(sub.name+'_CCE'+n);});});
+  var hdrs=['Name','Roll','Division','PRN','Term','Status'].concat(cHdrs).concat(subjects.map(function(s){return s.name+'_ESE';})).concat(subjects.map(function(s){return s.name+'_TW';})).concat(subjects.map(function(s){return s.name+'_Total';})).concat(['Grand Total','Percentage','Grade']);
+  var rows=marksData.map(function(m){
+    var stu=students.find(function(s){return s.id===m.studentId;})||{name:'?',roll:'?',div:'',prn:''};
+    var r=calcRow(m);var g=grade(r.pct);
+    var cVals=[];subjects.forEach(function(sub){[1,2,3,4,5].forEach(function(n){cVals.push(String((m.marks[sub.name]&&m.marks[sub.name].cce&&m.marks[sub.name].cce[n-1])||0));});});
+    var eVals=subjects.map(function(sub){return String((m.marks[sub.name]&&m.marks[sub.name].ese)||0);});
+    var tVals=subjects.map(function(sub){return String((m.marks[sub.name]&&m.marks[sub.name].tw)||0);});
+    var stVals=subjects.map(function(sub){return String(m.marks[sub.name]?calcSub(m.marks[sub.name]):0);});
+    return[stu.name,stu.roll,stu.div||'',stu.prn||'',m.term,m.status].concat(cVals).concat(eVals).concat(tVals).concat(stVals).concat([String(r.total),String(r.pct)+'%',g]);
+  });
+  dl([hdrs].concat(rows),'exam_results.csv');
+}
+function exportTemplate(){
+  if(!subjects.length){alert('Please add subjects first from the Subjects page.');return;}
+  var cHdrs=[];subjects.forEach(function(sub){[1,2,3,4,5].forEach(function(n){cHdrs.push(sub.name+'_CCE'+n);});});
+  var hdrs=['Name','Roll','Division','PRN','Term','Status'].concat(cHdrs).concat(subjects.map(function(s){return s.name+'_ESE';})).concat(subjects.map(function(s){return s.name+'_TW';}));
+  var ex=['Sample Student','22CS101','A','PRN001','Semester I','Pass'];
+  subjects.forEach(function(){[1,2,3,4,5].forEach(function(){ex.push('7');});});
+  subjects.forEach(function(){ex.push('45');});
+  subjects.forEach(function(){ex.push('20');});
+  dl([hdrs,ex],'marks_template.csv');
+}
+function exportStudents(){
+  if(!students.length){alert('No students to export yet.');return;}
+  dl([['Roll','Name','Division','PRN','Email','Phone']].concat(students.map(function(s){return[s.roll,s.name,s.div,s.prn||'',s.email||'',s.phone||''];})),'students.csv');
+}
+function exportSubjects(){
+  if(!subjects.length){alert('No subjects to export yet.');return;}
+  dl([['Subject Name','Code','CCE Max','ESE Max','TW Max','Total per Subject']].concat(subjects.map(function(s){return[s.name,s.code||'',40,60,25,125];})),'subjects.csv');
+}
+
+function handleImport(input){
+  var file=input.files[0];if(!file)return;
+  var res=document.getElementById('import-res');
+  if(res)res.innerHTML='<div class="ibar">Reading file...</div>';
+  if(!file.name.toLowerCase().endsWith('.csv')){if(res)res.innerHTML='<div class="wbar">Please save your Excel file as CSV first: File &rarr; Save As &rarr; CSV UTF-8, then upload.</div>';input.value='';return;}
+  var reader=new FileReader();
+  reader.onload=function(e){var parsed=Papa.parse(e.target.result,{header:true,skipEmptyLines:true});showImportPreview(parsed.data);};
+  reader.readAsText(file);input.value='';
+}
+function showImportPreview(rows){
+  var res=document.getElementById('import-res');if(!res)return;
+  if(!rows.length){res.innerHTML='<div class="wbar">No data found in file.</div>';return;}
+  var keys=Object.keys(rows[0]),sample=rows.slice(0,3);
+  var tbl='<div class="tw" style="margin:10px 0;max-height:150px;overflow-y:auto"><table><thead><tr>'+keys.map(function(k){return'<th>'+esc(k)+'</th>';}).join('')+'</tr></thead><tbody>'+sample.map(function(r){return'<tr>'+keys.map(function(k){return'<td>'+esc(r[k]||'')+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';
+  res.innerHTML='<div class="ibar">'+rows.length+' rows detected. Preview (first 3 rows):</div>'+tbl+'<button class="btn btn-pri btn-sm" onclick="doImport()">Import '+rows.length+' records</button>';
+  window._importRows=rows;
+}
+function doImport(){
+  var rows=window._importRows||[],added=0;
+  rows.forEach(function(r){
+    var name=r.Name||r.name||'',roll=r.Roll||r.roll||'';if(!name)return;
+    var stu=students.find(function(s){return s.roll===roll;});
+    if(!stu){stu={id:nextStuId++,roll:roll,name:name,div:r.Division||r.div||'A',prn:r.PRN||r.prn||'',email:r.Email||r.email||'',phone:r.Phone||r.phone||''};students.push(stu);}
+    var term=r.Term||r.term||r.Exam||r.exam||'Semester I',status=r.Status||r.status||'Pass',marks={};
+    subjects.forEach(function(sub){marks[sub.name]={cce:[1,2,3,4,5].map(function(n){return parseInt(r[sub.name+'_CCE'+n])||0;}),ese:parseInt(r[sub.name+'_ESE'])||0,tw:parseInt(r[sub.name+'_TW'])||0};});
+    var ei=marksData.findIndex(function(m){return m.studentId===stu.id&&m.term===term;});
+    if(ei>=0){marksData[ei]=Object.assign({},marksData[ei],{marks:marks,status:status});}
+    else{marksData.push({id:nextMarkId++,studentId:stu.id,term:term,status:status,marks:marks});}
+    added++;
+  });
+  var res=document.getElementById('import-res');
+  if(res)res.innerHTML='<div class="sbar">'+added+' records imported! Go to Dashboard to view the data.</div>';
+}
+
+function loadGHConfig(){var cfg=JSON.parse(localStorage.getItem('gh_cfg')||'{}');document.getElementById('gh-token').value=cfg.token||'';document.getElementById('gh-user').value=cfg.user||'nakulgodse1307-ai';document.getElementById('gh-repo').value=cfg.repo||'dbms-result-system';document.getElementById('gh-branch').value=cfg.branch||'main';}
+function saveGHConfig(){
+  var cfg={token:(document.getElementById('gh-token').value||'').trim(),user:(document.getElementById('gh-user').value||'').trim(),repo:(document.getElementById('gh-repo').value||'').trim(),branch:(document.getElementById('gh-branch').value||'main').trim()};
+  if(!cfg.token||!cfg.user||!cfg.repo){alert('Please fill in all fields.');return;}
+  localStorage.setItem('gh_cfg',JSON.stringify(cfg));setGHStatus(true,cfg.user+'/'+cfg.repo);
+  document.getElementById('gh-result').innerHTML='<div class="sbar">Config saved! Use Push/Pull buttons to sync data.</div>';
+}
+function setGHStatus(on,lbl){var d=document.getElementById('gh-dot');if(d)d.className='dot'+(on?' on':'');var l=document.getElementById('gh-lbl');if(l)l.textContent=lbl||'Not Connected';}
+function setSyncStatus(txt,on){var d=document.getElementById('sync-dot');if(d)d.className='dot'+(on?' on':'');var l=document.getElementById('sync-lbl');if(l)l.textContent=txt;}
+function getGHCfg(){var cfg=JSON.parse(localStorage.getItem('gh_cfg')||'{}');if(!cfg.token){alert('Set up GitHub Config first (click GitHub Config in sidebar).');return null;}return cfg;}
+
+function pushGH(){
+  var cfg=getGHCfg();if(!cfg)return;
+  var data={students:students,subjects:subjects,marksData:marksData,nextStuId:nextStuId,nextMarkId:nextMarkId,pushTime:new Date().toISOString()};
+  var content=btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
+  var url='https://api.github.com/repos/'+cfg.user+'/'+cfg.repo+'/contents/data.json';
+  setSyncStatus('Pushing...',false);
+  fetch(url,{headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}})
+    .then(function(r){return r.ok?r.json().then(function(d){return d.sha;}):null;})
+    .then(function(sha){var body={message:'Update data '+new Date().toLocaleString(),content:content};if(sha)body.sha=sha;return fetch(url,{method:'PUT',headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify(body)});})
+    .then(function(r){if(r.ok){setSyncStatus('Pushed '+new Date().toLocaleTimeString(),true);setGHStatus(true,cfg.user+'/'+cfg.repo);alert('Data pushed! Students can Pull to see latest data.');}else{return r.json().then(function(e){throw new Error(e.message||r.status);});}})
+    .catch(function(e){setSyncStatus('Push failed',false);alert('Push error: '+e.message);});
+}
+function pullGH(){
+  var cfg=getGHCfg();if(!cfg)return;
+  setSyncStatus('Pulling...',false);
+  fetch('https://api.github.com/repos/'+cfg.user+'/'+cfg.repo+'/contents/data.json',{headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}})
+    .then(function(r){if(!r.ok)throw new Error(r.status===404?'data.json not found. Push data first.':'HTTP '+r.status);return r.json();})
+    .then(function(d){
+      var text=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+      var data=JSON.parse(text);
+      if(data.students)students=data.students;if(data.subjects)subjects=data.subjects;if(data.marksData)marksData=data.marksData;if(data.nextStuId)nextStuId=data.nextStuId;if(data.nextMarkId)nextMarkId=data.nextMarkId;
+      setSyncStatus('Pulled '+new Date().toLocaleTimeString(),true);setGHStatus(true,cfg.user+'/'+cfg.repo);
+      renderDash();alert('Data pulled! Last pushed: '+(data.pushTime?new Date(data.pushTime).toLocaleString():'unknown'));
+    })
+    .catch(function(e){setSyncStatus('Pull failed',false);alert('Pull error: '+e.message);});
+}
+
+(function(){var cfg=JSON.parse(localStorage.getItem('gh_cfg')||'{}');if(cfg.token)setGHStatus(true,cfg.user+'/'+cfg.repo);renderDash();updTabs();})();
+</script>
 </body>
 </html>
