@@ -106,5 +106,14 @@
     "internal": 25,
     "theory": 50,
     "status": "Pass"
+  },
+  {
+    "id": 13,
+    "studentId": 12,
+    "exam": "Unit Test IV",
+    "practical": 25,
+    "internal": 24,
+    "theory": 40,
+    "status": "Pass"
   }
 ]
