@@ -1,0 +1,29 @@
+{
+  "students": [],
+  "subjects": [
+    {
+      "name": "Mathematics",
+      "code": "MATH301"
+    },
+    {
+      "name": "Science",
+      "code": "SCI301"
+    },
+    {
+      "name": "English",
+      "code": "ENG301"
+    },
+    {
+      "name": "Hindi",
+      "code": "HIN301"
+    },
+    {
+      "name": "Computer",
+      "code": "CS301"
+    }
+  ],
+  "marksData": [],
+  "nextStuId": 1,
+  "nextMarkId": 1,
+  "pushTime": "2026-04-04T17:45:14.763Z"
+}
