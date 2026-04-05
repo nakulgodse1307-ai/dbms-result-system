@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -228,11 +227,11 @@ tr:hover td{background:var(--bg3)}
       <div class="sec-hdr"><h2>Import / Export</h2></div>
       <div class="panel" style="margin-bottom:14px">
         <div class="panel-title">Import from Excel / CSV</div>
-        <div class="ibar">Columns needed: Name, Roll, Division, PRN, Term, Status — then for each subject:<br/>SubjectName_CCE1 to CCE5 | SubjectName_ESE | SubjectName_TW</div>
+        <div class="ibar">Upload the Excel template you downloaded from this page — fill it in and upload directly. Both .xlsx and .csv files are supported.</div>
         <div class="iz" onclick="document.getElementById('file-inp').click()">
           <div class="iz-txt" style="font-size:22px;margin-bottom:6px;opacity:.5">&#8679;</div>
-          <div class="iz-txt">Click to upload CSV file</div>
-          <div class="iz-sub">Save Excel as CSV first: File &rarr; Save As &rarr; CSV UTF-8</div>
+          <div class="iz-txt">Click to upload Excel or CSV file</div>
+          <div class="iz-sub">.xlsx and .csv both supported — just upload directly</div>
           <input type="file" id="file-inp" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleImport(this)"/>
         </div>
         <div id="import-res"></div>
@@ -713,10 +712,46 @@ function handleImport(input){
   var file=input.files[0];if(!file)return;
   var res=document.getElementById('import-res');
   if(res)res.innerHTML='<div class="ibar">Reading file...</div>';
-  if(!file.name.toLowerCase().endsWith('.csv')){if(res)res.innerHTML='<div class="wbar">Please save your Excel file as CSV first: File &rarr; Save As &rarr; CSV UTF-8, then upload.</div>';input.value='';return;}
-  var reader=new FileReader();
-  reader.onload=function(e){var parsed=Papa.parse(e.target.result,{header:true,skipEmptyLines:true});showImportPreview(parsed.data);};
-  reader.readAsText(file);input.value='';
+  var name=file.name.toLowerCase();
+  if(name.endsWith('.xlsx')||name.endsWith('.xls')){
+    if(typeof ExcelJS==='undefined'){if(res)res.innerHTML='<div class="wbar">Excel library still loading, wait 3 seconds and try again.</div>';input.value='';return;}
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var wb=new ExcelJS.Workbook();
+      wb.xlsx.load(e.target.result).then(function(){
+        var ws=wb.worksheets[0];
+        var rows=[],hdrs=[];
+        ws.eachRow(function(row,ri){
+          if(ri===1){
+            row.eachCell(function(cell,ci){hdrs[ci]=String(cell.value||'').trim();});
+          } else if(ri===2){
+            var isSubHdr=true;
+            row.eachCell(function(cell){var v=String(cell.value||'');if(v&&!['CCE 1','CCE 2','CCE 3','CCE 4','CCE 5','ESE /60','Term Work /25','Total /125',''].includes(v))isSubHdr=false;});
+            if(isSubHdr)return;
+            var obj={};row.eachCell(function(cell,ci){if(hdrs[ci])obj[hdrs[ci]]=cell.value||'';});
+            if(Object.values(obj).some(function(v){return v!=='';}))rows.push(obj);
+          } else if(ri===3){
+            var v=String(row.getCell(6).value||'');
+            if(v==='Max →'||v==='Max →')return;
+            var obj={};row.eachCell(function(cell,ci){if(hdrs[ci])obj[hdrs[ci]]=cell.value||'';});
+            if(Object.values(obj).some(function(v){return v!=='';}))rows.push(obj);
+          } else {
+            var obj={};row.eachCell(function(cell,ci){if(hdrs[ci])obj[hdrs[ci]]=cell.value||'';});
+            if(obj.Name||obj.name)rows.push(obj);
+          }
+        });
+        showImportPreview(rows);
+      }).catch(function(e){if(res)res.innerHTML='<div class="wbar">Could not read Excel file: '+e.message+'</div>';});
+    };
+    reader.readAsArrayBuffer(file);
+  } else if(name.endsWith('.csv')){
+    var reader=new FileReader();
+    reader.onload=function(e){var parsed=Papa.parse(e.target.result,{header:true,skipEmptyLines:true});showImportPreview(parsed.data);};
+    reader.readAsText(file);
+  } else {
+    if(res)res.innerHTML='<div class="wbar">Please upload an Excel (.xlsx) or CSV file.</div>';
+  }
+  input.value='';
 }
 function showImportPreview(rows){
   var res=document.getElementById('import-res');if(!res)return;
