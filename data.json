@@ -35,6 +35,15 @@
       "prn": "jbkj",
       "email": "",
       "phone": ""
+    },
+    {
+      "id": 5,
+      "roll": 45,
+      "name": "nakul",
+      "div": "A",
+      "prn": 8275,
+      "email": "",
+      "phone": ""
     }
   ],
   "subjects": [
@@ -137,9 +146,39 @@
           "tw": 7
         }
       }
+    },
+    {
+      "id": 4,
+      "studentId": 5,
+      "term": "sem1",
+      "status": "pass",
+      "marks": {
+        "dbms": {
+          "cce": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "ese": 0,
+          "tw": 0
+        },
+        "m3": {
+          "cce": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "ese": 0,
+          "tw": 0
+        }
+      }
     }
   ],
-  "nextStuId": 5,
-  "nextMarkId": 4,
-  "pushTime": "2026-04-04T20:19:13.296Z"
+  "nextStuId": 6,
+  "nextMarkId": 5,
+  "pushTime": "2026-04-05T13:33:44.456Z"
 }
