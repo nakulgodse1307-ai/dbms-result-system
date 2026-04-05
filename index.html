@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +7,7 @@
 <title>DBMS Result System</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#30363d;--border:#30363d;--border2:#3d444d;--text:#e6edf3;--text2:#8b949e;--text3:#6e7681;--teal:#39d353;--teal-dim:#1a6334;--blue:#58a6ff;--blue-dim:#1f3a5f;--red:#f85149;--red-dim:#5c1a1a;--amber:#d29922;--amber-dim:#3d2800;--purple:#bc8cff;--green:#3fb950;--green-dim:#1a4228;--cyan:#79c0ff;--r:8px;--rl:12px}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -238,8 +240,8 @@ tr:hover td{background:var(--bg3)}
       <div class="panel">
         <div class="panel-title">Export Data</div>
         <div class="exp-grid">
-          <div class="exp-card"><h3>Export All Results</h3><p>Complete CCE, ESE, TW breakdown for all students</p><button class="btn-grn" onclick="exportCSV()">Download CSV</button></div>
-          <div class="exp-card"><h3>Download Template</h3><p>Blank CSV with correct columns for your subjects — fill in Excel and import back</p><button class="btn-grn" onclick="exportTemplate()">Download Template</button></div>
+          <div class="exp-card"><h3>Export All Results</h3><p>Complete CCE, ESE, TW breakdown with colour-coded subject columns</p><button class="btn-grn" onclick="exportXLSX(false)">Download Excel (.xlsx)</button></div>
+          <div class="exp-card"><h3>Download Template</h3><p>Colour-coded Excel template with merged subject headers — open in Excel and fill in marks</p><button class="btn-grn" onclick="exportTemplate()">Download Excel Template</button></div>
           <div class="exp-card"><h3>Export Students List</h3><p>Student records only (no marks)</p><button class="btn-grn" onclick="exportStudents()">Download Students CSV</button></div>
           <div class="exp-card"><h3>Export Subjects</h3><p>Current subject list and mark structure</p><button class="btn-grn" onclick="exportSubjects()">Download Subjects CSV</button></div>
         </div>
@@ -462,7 +464,233 @@ function renderResults(){
   if(tb)tb.innerHTML=f.length?f.map(function(m,i){var stu=students.find(function(s){return s.id===m.studentId;})||{name:'?',roll:'?'};var r=calcRow(m);var g=grade(r.pct);return'<tr><td>'+(i+1)+'</td><td class="tm td2">'+esc(stu.roll)+'</td><td style="font-weight:500">'+esc(stu.name)+'</td><td class="td2">'+esc(m.term)+'</td><td class="tm">'+r.cce+'</td><td class="tm">'+r.ese+'</td><td class="tm">'+r.tw+'</td><td class="tb">'+r.total+'</td><td class="tm">'+r.pct+'%</td><td><span class="badge '+gbc(g)+'">'+g+'</span></td><td>'+sbadge(m.status)+'</td></tr>';}).join(''):'<tr><td colspan="11" class="empty">No results match filters</td></tr>';
 }
 
-function dl(rows,filename){
+
+
+function subVals(m){
+  var v=[];
+  subjects.forEach(function(sub){
+    var mk=m.marks&&m.marks[sub.name];
+    var cce=mk&&mk.cce?mk.cce:[],ese=mk?parseInt(mk.ese)||0:0,tw=mk?parseInt(mk.tw)||0:0;
+    var cceSum=cce.reduce(function(a,x){return a+(parseInt(x)||0);},0);
+    [0,1,2,3,4].forEach(function(i){v.push(parseInt(cce[i])||0);});
+    v.push(ese,tw,cceSum+ese+tw);
+  });
+  return v;
+}
+function exportCSV(){
+  if(!marksData.length){alert('No marks data to export yet.\nAdd student marks first.');return;}
+  var hdrs=['Name','Roll','Division','PRN','Term','Status'];
+  subjects.forEach(function(sub){var s=sub.name;hdrs.push(s+' CCE1',s+' CCE2',s+' CCE3',s+' CCE4',s+' CCE5',s+' ESE',s+' TW',s+' Total');});
+  hdrs.push('Grand Total','Percentage','Grade');
+  var rows=marksData.map(function(m){
+    var stu=students.find(function(s){return s.id===m.studentId;})||{name:'?',roll:'?',div:'',prn:''};
+    var r=calcRow(m);var g=grade(r.pct);
+    return[stu.name,stu.roll,stu.div||'',stu.prn||'',m.term,m.status].concat(subVals(m)).concat([r.total,r.pct+'%',g]);
+  });
+  dlCSV([hdrs].concat(rows),'exam_results.csv');
+}
+function exportTemplate(){
+  if(!subjects.length){alert('Please add subjects first from the Subjects page.');return;}
+  buildExcel(true);
+}
+function exportXLSX(templateOnly){
+  buildExcel(templateOnly);
+}
+function buildExcel(templateOnly){
+  if(typeof ExcelJS==='undefined'){alert('Excel library loading, please wait 3 seconds and try again.');return;}
+  var SUB_COLORS=[
+    {bg:'BDD7EE',fg:'1F4E79'},{bg:'C6EFCE',fg:'276221'},{bg:'FFE699',fg:'7D5A00'},
+    {bg:'E2CFFF',fg:'3B1F7A'},{bg:'FFD7D7',fg:'7A1F1F'},{bg:'B3E5FC',fg:'014361'},
+    {bg:'FFE0B2',fg:'6D3A00'},{bg:'F8BBD9',fg:'7A1F4E'}
+  ];
+  var INFO={bg:'D6DCE4',fg:'1F2937'};
+  var CCE={bg:'E2EFDA',fg:'375623'};
+  var ESE={bg:'DDEEFF',fg:'0C447C'};
+  var TW={bg:'FFF3CD',fg:'7D5A00'};
+  var TOT={bg:'F2F2F2',fg:'444444'};
+  var wb=new ExcelJS.Workbook();
+  wb.creator='DBMSRMS'; wb.created=new Date();
+  var ws=wb.addWorksheet('Marks Template');
+
+  function argb(hex){return 'FF'+hex.toUpperCase();}
+  function cellStyle(cell,bgHex,fgHex,bold,sz){
+    cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(bgHex)}};
+    cell.font={bold:!!bold,color:{argb:argb(fgHex)},size:sz||10,name:'Calibri'};
+    cell.border={top:{style:'thin',color:{argb:'FFBBBBBB'}},left:{style:'thin',color:{argb:'FFBBBBBB'}},bottom:{style:'thin',color:{argb:'FFBBBBBB'}},right:{style:'thin',color:{argb:'FFBBBBBB'}}};
+    cell.alignment={horizontal:'center',vertical:'middle',wrapText:true};
+  }
+  function lightTint(hex){
+    var r=Math.min(255,parseInt(hex.slice(0,2),16)+40);
+    var g=Math.min(255,parseInt(hex.slice(2,4),16)+40);
+    var b=Math.min(255,parseInt(hex.slice(4,6),16)+40);
+    return (r<16?'0':'')+r.toString(16)+(g<16?'0':'')+g.toString(16)+(b<16?'0':'')+b.toString(16);
+  }
+
+  var infoHdrs=['Name','Roll','Division','PRN','Term','Status'];
+  var subHdrLabels=['CCE 1','CCE 2','CCE 3','CCE 4','CCE 5','ESE /60','Term Work /25','Total /125'];
+  var maxVals=[8,8,8,8,8,60,25,125];
+  var colWidths=[22,10,9,12,13,10];
+  subjects.forEach(function(){[7,7,7,7,7,8,12,9].forEach(function(w){colWidths.push(w);});});
+  if(!templateOnly){colWidths.push(11,10,7);}
+
+  ws.columns=colWidths.map(function(w){return{width:w};});
+
+  // ROW 1 — info + subject merged headers
+  var r1=ws.addRow([]);
+  r1.height=22;
+  infoHdrs.forEach(function(h,i){
+    var c=r1.getCell(i+1); c.value=h; cellStyle(c,INFO.bg,INFO.fg,true,10);
+  });
+  subjects.forEach(function(sub,si){
+    var startCol=infoHdrs.length+si*8+1;
+    var clr=SUB_COLORS[si%SUB_COLORS.length];
+    var c=r1.getCell(startCol); c.value=sub.name; cellStyle(c,clr.bg,clr.fg,true,11);
+    ws.mergeCells(1,startCol,1,startCol+7);
+    // Style all merged cells
+    for(var x=startCol;x<=startCol+7;x++){
+      var mc=r1.getCell(x);
+      mc.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(clr.bg)}};
+      mc.border={top:{style:'thin',color:{argb:'FFBBBBBB'}},left:{style:'thin',color:{argb:'FFBBBBBB'}},bottom:{style:'thin',color:{argb:'FFBBBBBB'}},right:{style:'thin',color:{argb:'FFBBBBBB'}}};
+    }
+  });
+  if(!templateOnly){
+    ['Grand Total','Percentage','Grade'].forEach(function(h,i){
+      var c=r1.getCell(infoHdrs.length+subjects.length*8+i+1);
+      cellStyle(c,'2F4F4F','FFFFFF',true,10); c.value=h;
+    });
+  }
+
+  // ROW 2 — sub-headers
+  var r2=ws.addRow([]); r2.height=20;
+  infoHdrs.forEach(function(h,i){cellStyle(r2.getCell(i+1),INFO.bg,INFO.fg,false,9);});
+  subjects.forEach(function(sub,si){
+    var clr=SUB_COLORS[si%SUB_COLORS.length];
+    subHdrLabels.forEach(function(lbl,hi){
+      var col=infoHdrs.length+si*8+hi+1;
+      var c=r2.getCell(col); c.value=lbl;
+      var bg=hi<5?CCE.bg:(hi===5?ESE.bg:(hi===6?TW.bg:TOT.bg));
+      var fg=hi<5?CCE.fg:(hi===5?ESE.fg:(hi===6?TW.fg:TOT.fg));
+      cellStyle(c,bg,fg,true,9);
+    });
+  });
+  if(!templateOnly){
+    for(var x=0;x<3;x++){cellStyle(r2.getCell(infoHdrs.length+subjects.length*8+x+1),'2F4F4F','FFFFFF',false,9);}
+  }
+
+  // ROW 3 — max marks reference
+  var r3=ws.addRow([]); r3.height=16;
+  var maxInfoVals=['','','','','','Max →'];
+  maxInfoVals.forEach(function(v,i){
+    var c=r3.getCell(i+1); c.value=v;
+    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF7F7F7'}};
+    c.font={size:9,color:{argb:'FF888888'},italic:true,name:'Calibri'};
+    c.border={top:{style:'thin',color:{argb:'FFBBBBBB'}},left:{style:'thin',color:{argb:'FFBBBBBB'}},bottom:{style:'thin',color:{argb:'FFBBBBBB'}},right:{style:'thin',color:{argb:'FFBBBBBB'}}};
+    c.alignment={horizontal:'center',vertical:'middle'};
+  });
+  subjects.forEach(function(sub,si){
+    maxVals.forEach(function(mv,hi){
+      var c=r3.getCell(infoHdrs.length+si*8+hi+1); c.value=mv;
+      c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF7F7F7'}};
+      c.font={size:9,color:{argb:'FF888888'},italic:true,name:'Calibri'};
+      c.border={top:{style:'thin',color:{argb:'FFBBBBBB'}},left:{style:'thin',color:{argb:'FFBBBBBB'}},bottom:{style:'thin',color:{argb:'FFBBBBBB'}},right:{style:'thin',color:{argb:'FFBBBBBB'}}};
+      c.alignment={horizontal:'center',vertical:'middle'};
+    });
+  });
+
+  // DATA ROWS
+  if(templateOnly){
+    // 20 empty coloured rows
+    for(var ri=0;ri<20;ri++){
+      var dr=ws.addRow([]); dr.height=18;
+      infoHdrs.forEach(function(h,i){
+        var c=dr.getCell(i+1);
+        c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFFFF'}};
+        c.border={top:{style:'thin',color:{argb:'FFBBBBBB'}},left:{style:'thin',color:{argb:'FFBBBBBB'}},bottom:{style:'thin',color:{argb:'FFBBBBBB'}},right:{style:'thin',color:{argb:'FFBBBBBB'}}};
+        c.alignment={horizontal:'center',vertical:'middle'};
+      });
+      subjects.forEach(function(sub,si){
+        var clr=SUB_COLORS[si%SUB_COLORS.length];
+        var lt=lightTint(clr.bg);
+        for(var hi=0;hi<8;hi++){
+          var c=dr.getCell(infoHdrs.length+si*8+hi+1);
+          var bg=hi<5?lt:(hi===5?'F0F6FF':(hi===6?'FFFDF0':'F8F8F8'));
+          c.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(bg)}};
+          c.border={top:{style:'thin',color:{argb:'FFBBBBBB'}},left:{style:'thin',color:{argb:'FFBBBBBB'}},bottom:{style:'thin',color:{argb:'FFBBBBBB'}},right:{style:'thin',color:{argb:'FFBBBBBB'}}};
+          c.alignment={horizontal:'center',vertical:'middle'};
+        }
+      });
+    }
+  } else {
+    marksData.forEach(function(m){
+      var stu=students.find(function(s){return s.id===m.studentId;})||{name:'?',roll:'?',div:'',prn:''};
+      var r=calcRow(m); var g=grade(r.pct);
+      var vals=[stu.name,stu.roll,stu.div||'',stu.prn||'',m.term,m.status];
+      subVals(m).forEach(function(v){vals.push(v);});
+      vals.push(r.total,r.pct+'%',g);
+      var dr=ws.addRow(vals); dr.height=18;
+      dr.eachCell(function(cell,ci){
+        cell.border={top:{style:'thin',color:{argb:'FFBBBBBB'}},left:{style:'thin',color:{argb:'FFBBBBBB'}},bottom:{style:'thin',color:{argb:'FFBBBBBB'}},right:{style:'thin',color:{argb:'FFBBBBBB'}}};
+        cell.alignment={horizontal:'center',vertical:'middle'};
+        if(ci>6&&ci<=6+subjects.length*8){
+          var si=Math.floor((ci-7)/8);
+          var hi=(ci-7)%8;
+          var clr=SUB_COLORS[si%SUB_COLORS.length];
+          var lt=lightTint(clr.bg);
+          var bg=hi<5?lt:(hi===5?'F0F6FF':(hi===6?'FFFDF0':'F8F8F8'));
+          cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(bg)}};
+        }
+      });
+    });
+  }
+
+  ws.views=[{state:'frozen',xSplit:6,ySplit:3}];
+
+  // INSTRUCTIONS sheet
+  var ws2=wb.addWorksheet('Instructions');
+  var instrs=[
+    ['DBMSRMS — How to fill this template'],[''],
+    ['STEP BY STEP:'],
+    ['1.  Do NOT change Row 1 (subject names) or Row 2 (CCE/ESE/TW labels)'],
+    ['2.  Row 3 shows max marks for reference — do not edit it'],
+    ['3.  Fill one student per row starting from Row 4'],
+    ['4.  CCE 1 to CCE 5: marks out of 8 for each test'],
+    ['5.  ESE: end semester exam marks out of 60'],
+    ['6.  Term Work: assignment/practical marks out of 25'],
+    ['7.  Leave the Total column blank — app calculates it automatically'],
+    [''],['TERM column values:'],
+    ['Semester I / Semester II / Semester III / Semester IV / Semester V / Semester VI / Semester VII / Semester VIII'],
+    [''],['STATUS column values:'],['Pass   /   Fail   /   Withheld'],
+    [''],['SAVING & IMPORTING:'],
+    ['1.  Save this file as CSV: File → Save As → CSV UTF-8'],
+    ['2.  Open DBMSRMS app → Import / Export → upload CSV'],
+    ['3.  Click Import → then Push to GitHub'],
+    [''],['MARKS PER SUBJECT:'],
+    ['CCE (5 tests × 8 marks each) = 40'],
+    ['ESE Exam = 60'],
+    ['Term Work / Assignment = 25'],
+    ['Total per subject = 125'],
+  ];
+  instrs.forEach(function(row,i){
+    var r=ws2.addRow(row); r.height=18;
+    var c=r.getCell(1);
+    if(i===0){c.font={bold:true,size:14,color:{argb:'FF1F4E79'},name:'Calibri'};}
+    else if(row[0]&&['STEP BY STEP:','TERM column values:','STATUS column values:','SAVING & IMPORTING:','MARKS PER SUBJECT:'].indexOf(row[0])>-1){
+      c.font={bold:true,size:11,color:{argb:'FF1F2937'},name:'Calibri'};
+    } else {c.font={size:10,color:{argb:'FF444444'},name:'Calibri'};}
+    c.alignment={vertical:'middle'};
+  });
+  ws2.getColumn(1).width=72;
+
+  wb.xlsx.writeBuffer().then(function(buf){
+    var blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url; a.download=templateOnly?'marks_template.xlsx':'exam_results.xlsx';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},2000);
+  }).catch(function(e){alert('Excel export error: '+e.message);});
+}
+function dlCSV(rows,filename){
   try{
     var csv=rows.map(function(r){return r.map(function(v){return'"'+String(v).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
     var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
@@ -472,38 +700,13 @@ function dl(rows,filename){
     setTimeout(function(){URL.revokeObjectURL(url);},1500);
   }catch(e){alert('Download error: '+e.message);}
 }
-function exportCSV(){
-  if(!marksData.length){alert('No marks data to export yet.\nAdd student marks first.');return;}
-  var cHdrs=[];subjects.forEach(function(sub){[1,2,3,4,5].forEach(function(n){cHdrs.push(sub.name+'_CCE'+n);});});
-  var hdrs=['Name','Roll','Division','PRN','Term','Status'].concat(cHdrs).concat(subjects.map(function(s){return s.name+'_ESE';})).concat(subjects.map(function(s){return s.name+'_TW';})).concat(subjects.map(function(s){return s.name+'_Total';})).concat(['Grand Total','Percentage','Grade']);
-  var rows=marksData.map(function(m){
-    var stu=students.find(function(s){return s.id===m.studentId;})||{name:'?',roll:'?',div:'',prn:''};
-    var r=calcRow(m);var g=grade(r.pct);
-    var cVals=[];subjects.forEach(function(sub){[1,2,3,4,5].forEach(function(n){cVals.push(String((m.marks[sub.name]&&m.marks[sub.name].cce&&m.marks[sub.name].cce[n-1])||0));});});
-    var eVals=subjects.map(function(sub){return String((m.marks[sub.name]&&m.marks[sub.name].ese)||0);});
-    var tVals=subjects.map(function(sub){return String((m.marks[sub.name]&&m.marks[sub.name].tw)||0);});
-    var stVals=subjects.map(function(sub){return String(m.marks[sub.name]?calcSub(m.marks[sub.name]):0);});
-    return[stu.name,stu.roll,stu.div||'',stu.prn||'',m.term,m.status].concat(cVals).concat(eVals).concat(tVals).concat(stVals).concat([String(r.total),String(r.pct)+'%',g]);
-  });
-  dl([hdrs].concat(rows),'exam_results.csv');
-}
-function exportTemplate(){
-  if(!subjects.length){alert('Please add subjects first from the Subjects page.');return;}
-  var cHdrs=[];subjects.forEach(function(sub){[1,2,3,4,5].forEach(function(n){cHdrs.push(sub.name+'_CCE'+n);});});
-  var hdrs=['Name','Roll','Division','PRN','Term','Status'].concat(cHdrs).concat(subjects.map(function(s){return s.name+'_ESE';})).concat(subjects.map(function(s){return s.name+'_TW';}));
-  var ex=['Sample Student','22CS101','A','PRN001','Semester I','Pass'];
-  subjects.forEach(function(){[1,2,3,4,5].forEach(function(){ex.push('7');});});
-  subjects.forEach(function(){ex.push('45');});
-  subjects.forEach(function(){ex.push('20');});
-  dl([hdrs,ex],'marks_template.csv');
-}
 function exportStudents(){
   if(!students.length){alert('No students to export yet.');return;}
-  dl([['Roll','Name','Division','PRN','Email','Phone']].concat(students.map(function(s){return[s.roll,s.name,s.div,s.prn||'',s.email||'',s.phone||''];})),'students.csv');
+  dlCSV([['Roll','Name','Division','PRN','Email','Phone']].concat(students.map(function(s){return[s.roll,s.name,s.div,s.prn||'',s.email||'',s.phone||''];})),'students.csv');
 }
 function exportSubjects(){
   if(!subjects.length){alert('No subjects to export yet.');return;}
-  dl([['Subject Name','Code','CCE Max','ESE Max','TW Max','Total per Subject']].concat(subjects.map(function(s){return[s.name,s.code||'',40,60,25,125];})),'subjects.csv');
+  dlCSV([['Subject Name','Code','CCE Max','ESE Max','TW Max','Total per Subject']].concat(subjects.map(function(s){return[s.name,s.code||'',40,60,25,125];})),'subjects.csv');
 }
 
 function handleImport(input){
@@ -530,7 +733,7 @@ function doImport(){
     var stu=students.find(function(s){return s.roll===roll;});
     if(!stu){stu={id:nextStuId++,roll:roll,name:name,div:r.Division||r.div||'A',prn:r.PRN||r.prn||'',email:r.Email||r.email||'',phone:r.Phone||r.phone||''};students.push(stu);}
     var term=r.Term||r.term||r.Exam||r.exam||'Semester I',status=r.Status||r.status||'Pass',marks={};
-    subjects.forEach(function(sub){marks[sub.name]={cce:[1,2,3,4,5].map(function(n){return parseInt(r[sub.name+'_CCE'+n])||0;}),ese:parseInt(r[sub.name+'_ESE'])||0,tw:parseInt(r[sub.name+'_TW'])||0};});
+    subjects.forEach(function(sub){var s=sub.name;marks[s]={cce:[1,2,3,4,5].map(function(n){return parseInt(r[s+' CCE'+n]||r[s+'_CCE'+n])||0;}),ese:parseInt(r[s+' ESE']||r[s+'_ESE'])||0,tw:parseInt(r[s+' TW']||r[s+'_TW'])||0};});
     var ei=marksData.findIndex(function(m){return m.studentId===stu.id&&m.term===term;});
     if(ei>=0){marksData[ei]=Object.assign({},marksData[ei],{marks:marks,status:status});}
     else{marksData.push({id:nextMarkId++,studentId:stu.id,term:term,status:status,marks:marks});}
@@ -551,31 +754,63 @@ function setGHStatus(on,lbl){var d=document.getElementById('gh-dot');if(d)d.clas
 function setSyncStatus(txt,on){var d=document.getElementById('sync-dot');if(d)d.className='dot'+(on?' on':'');var l=document.getElementById('sync-lbl');if(l)l.textContent=txt;}
 function getGHCfg(){var cfg=JSON.parse(localStorage.getItem('gh_cfg')||'{}');if(!cfg.token){alert('Set up GitHub Config first (click GitHub Config in sidebar).');return null;}return cfg;}
 
+function toBase64(str){
+  var bytes=new TextEncoder().encode(str);
+  var bin='';
+  bytes.forEach(function(b){bin+=String.fromCharCode(b);});
+  return btoa(bin);
+}
+function fromBase64(b64){
+  var bin=atob(b64.replace(/\s/g,''));
+  var bytes=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  return new TextDecoder('utf-8').decode(bytes);
+}
 function pushGH(){
   var cfg=getGHCfg();if(!cfg)return;
   var data={students:students,subjects:subjects,marksData:marksData,nextStuId:nextStuId,nextMarkId:nextMarkId,pushTime:new Date().toISOString()};
-  var content=btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
+  var json=JSON.stringify(data,null,2);
+  var content=toBase64(json);
   var url='https://api.github.com/repos/'+cfg.user+'/'+cfg.repo+'/contents/data.json';
   setSyncStatus('Pushing...',false);
   fetch(url,{headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}})
     .then(function(r){return r.ok?r.json().then(function(d){return d.sha;}):null;})
-    .then(function(sha){var body={message:'Update data '+new Date().toLocaleString(),content:content};if(sha)body.sha=sha;return fetch(url,{method:'PUT',headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify(body)});})
-    .then(function(r){if(r.ok){setSyncStatus('Pushed '+new Date().toLocaleTimeString(),true);setGHStatus(true,cfg.user+'/'+cfg.repo);alert('Data pushed! Students can Pull to see latest data.');}else{return r.json().then(function(e){throw new Error(e.message||r.status);});}})
+    .then(function(sha){
+      var body={message:'Update data '+new Date().toLocaleString(),content:content};
+      if(sha)body.sha=sha;
+      return fetch(url,{method:'PUT',headers:{'Authorization':'token '+cfg.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify(body)});
+    })
+    .then(function(r){
+      if(r.ok){setSyncStatus('Pushed '+new Date().toLocaleTimeString(),true);setGHStatus(true,cfg.user+'/'+cfg.repo);alert('Data pushed! Students can Pull to see latest data.');}
+      else{return r.json().then(function(e){throw new Error(e.message||r.status);});}
+    })
     .catch(function(e){setSyncStatus('Push failed',false);alert('Push error: '+e.message);});
 }
 function pullGH(){
   var cfg=getGHCfg();if(!cfg)return;
   setSyncStatus('Pulling...',false);
   fetch('https://api.github.com/repos/'+cfg.user+'/'+cfg.repo+'/contents/data.json',{headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}})
-    .then(function(r){if(!r.ok)throw new Error(r.status===404?'data.json not found. Push data first.':'HTTP '+r.status);return r.json();})
-    .then(function(d){
-      var text=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
-      var data=JSON.parse(text);
-      if(data.students)students=data.students;if(data.subjects)subjects=data.subjects;if(data.marksData)marksData=data.marksData;if(data.nextStuId)nextStuId=data.nextStuId;if(data.nextMarkId)nextMarkId=data.nextMarkId;
-      setSyncStatus('Pulled '+new Date().toLocaleTimeString(),true);setGHStatus(true,cfg.user+'/'+cfg.repo);
-      renderDash();alert('Data pulled! Last pushed: '+(data.pushTime?new Date(data.pushTime).toLocaleString():'unknown'));
+    .then(function(r){
+      if(!r.ok)throw new Error(r.status===404?'data.json not found on GitHub. Open app on laptop and Push first.':'HTTP error '+r.status+'. Check your token and repo name.');
+      return r.json();
     })
-    .catch(function(e){setSyncStatus('Pull failed',false);alert('Pull error: '+e.message);});
+    .then(function(d){
+      var text=fromBase64(d.content);
+      var data=JSON.parse(text);
+      if(data.students)students=data.students;
+      if(data.subjects)subjects=data.subjects;
+      if(data.marksData)marksData=data.marksData;
+      if(data.nextStuId)nextStuId=data.nextStuId;
+      if(data.nextMarkId)nextMarkId=data.nextMarkId;
+      setSyncStatus('Pulled '+new Date().toLocaleTimeString(),true);
+      setGHStatus(true,cfg.user+'/'+cfg.repo);
+      renderDash();
+      alert('Data pulled successfully!\nLast pushed: '+(data.pushTime?new Date(data.pushTime).toLocaleString():'unknown'));
+    })
+    .catch(function(e){
+      setSyncStatus('Pull failed',false);
+      alert('Pull failed: '+e.message+'\n\nCommon fixes:\n1. Check GitHub Config token is correct\n2. Make sure data was Pushed from laptop first\n3. Check internet connection');
+    });
 }
 
 (function(){var cfg=JSON.parse(localStorage.getItem('gh_cfg')||'{}');if(cfg.token)setGHStatus(true,cfg.user+'/'+cfg.repo);renderDash();updTabs();})();
