@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#30363d;--border:#30363d;--border2:#3d444d;--text:#e6edf3;--text2:#8b949e;--text3:#6e7681;--teal:#39d353;--teal-dim:#1a6334;--blue:#58a6ff;--blue-dim:#1f3a5f;--red:#f85149;--red-dim:#5c1a1a;--amber:#d29922;--amber-dim:#3d2800;--purple:#bc8cff;--green:#3fb950;--green-dim:#1a4228;--cyan:#79c0ff;--r:8px;--rl:12px}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -134,6 +135,29 @@ tr:hover td{background:var(--bg3)}
 </head>
 <body>
 
+<!-- TEACHER LOCK SCREEN -->
+<div id="lock-screen" style="position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;align-items:center;justify-content:center;">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:2rem;width:340px;max-width:90vw">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem">
+      <div style="width:36px;height:36px;background:var(--teal);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#0d1117;font-family:JetBrains Mono,monospace">DB</div>
+      <div>
+        <div style="font-weight:600;font-size:15px">DBMSRMS</div>
+        <div style="font-size:11px;color:var(--text2);font-family:JetBrains Mono,monospace">Teacher Login</div>
+      </div>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:1rem">Enter teacher password to access the system</div>
+    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px">
+      <label style="font-size:11px;color:var(--text2);font-family:JetBrains Mono,monospace">PASSWORD</label>
+      <input type="password" id="lock-pwd" placeholder="Enter password" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:var(--r);font-size:14px;font-family:Outfit,sans-serif;outline:none;width:100%" onkeydown="if(event.key==='Enter')checkPwd()"/>
+    </div>
+    <div id="lock-err" style="font-size:12px;color:var(--red);margin-bottom:10px;display:none">Incorrect password. Try again.</div>
+    <button onclick="checkPwd()" style="width:100%;padding:10px;background:var(--teal);border:none;border-radius:var(--r);font-size:14px;font-weight:500;color:#0d1117;cursor:pointer;font-family:Outfit,sans-serif">Login</button>
+    <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);text-align:center">
+      <a href="student.html" style="font-size:12px;color:var(--text2);text-decoration:none">Student? View results here →</a>
+    </div>
+  </div>
+</div>
+
 <aside class="sb">
   <div class="sb-logo">
     <div class="logo-ico">DB</div>
@@ -145,7 +169,8 @@ tr:hover td{background:var(--bg3)}
     <button class="ni" onclick="goPage('marks')"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M1 2h14v2H1zM1 7h10v2H1zM1 12h7v2H1z"/></svg>Marks &amp; Grades</button>
     <button class="ni" onclick="goPage('subjects')"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v2H2zm0 4h12v2H2zm0 4h8v2H2z"/></svg>Subjects</button>
     <button class="ni" onclick="goPage('results')"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M14 2H2a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V3a1 1 0 00-1-1zM5 12H3v-2h2zm0-4H3V6h2zm0-4H3V2h2zm8 8H6V2h7v10z"/></svg>Results &amp; Report</button>
-    <button class="ni" onclick="goPage('import')"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M7.47 11.78a.75.75 0 001.06 0l4-4a.75.75 0 00-1.06-1.06L8.75 9.44V2.75a.75.75 0 00-1.5 0v6.69L4.53 6.72a.75.75 0 00-1.06 1.06l4 4z"/><path d="M2 13.25a.75.75 0 000 1.5h12a.75.75 0 000-1.5H2z"/></svg>Import / Export</button>
+    <button class="ni" onclick="goPage('analytics')"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M1 11h2v4H1zm4-4h2v8H5zm4-3h2v11H9zm4-4h2v15h-2z"/></svg>Analytics</button>
+        <button class="ni" onclick="goPage('import')"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M7.47 11.78a.75.75 0 001.06 0l4-4a.75.75 0 00-1.06-1.06L8.75 9.44V2.75a.75.75 0 00-1.5 0v6.69L4.53 6.72a.75.75 0 00-1.06 1.06l4 4z"/><path d="M2 13.25a.75.75 0 000 1.5h12a.75.75 0 000-1.5H2z"/></svg>Import / Export</button>
   </nav>
   <div class="sb-foot">
     <div class="gh-st"><span class="dot" id="gh-dot"></span><span id="gh-lbl">Not Connected</span></div>
@@ -220,6 +245,24 @@ tr:hover td{background:var(--bg3)}
         <select id="res-grade" onchange="renderResults()"><option value="">All Grades</option><option>O</option><option>A+</option><option>A</option><option>B+</option><option>B</option><option>C</option><option>F</option></select>
       </div>
       <div class="qpanel"><div class="tw"><table><thead><tr><th>#</th><th>ROLL</th><th>NAME</th><th>TERM</th><th>CCE TOTAL</th><th>ESE</th><th>TW</th><th>TOTAL</th><th>%</th><th>GRADE</th><th>STATUS</th></tr></thead><tbody id="res-tbody"></tbody></table></div></div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="page" id="page-analytics">
+      <div class="sec-hdr"><h2>Class Analytics</h2><span id="analytics-term-lbl" style="font-size:12px;color:var(--text2);font-family:JetBrains Mono,monospace"></span></div>
+      <div class="stats-grid" id="analytics-stats" style="margin-bottom:14px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div class="qpanel"><div class="qpanel-hdr"><h2>Grade Distribution</h2></div><div style="padding:16px;position:relative;height:220px"><canvas id="grade-donut"></canvas></div></div>
+        <div class="qpanel"><div class="qpanel-hdr"><h2>Subject Averages</h2></div><div style="padding:16px;position:relative;height:220px"><canvas id="sub-avg-bar"></canvas></div></div>
+      </div>
+      <div class="qpanel" style="margin-bottom:14px">
+        <div class="qpanel-hdr"><h2>Performance Heatmap</h2><span style="font-size:11px;color:var(--text2)">each cell = student × subject score</span></div>
+        <div style="padding:16px;overflow-x:auto"><div id="heatmap"></div></div>
+      </div>
+      <div class="qpanel">
+        <div class="qpanel-hdr"><h2>Top Performers</h2></div>
+        <div class="tw"><table><thead><tr><th>RANK</th><th>NAME</th><th>ROLL</th><th>%</th><th>GRADE</th><th>STATUS</th></tr></thead><tbody id="analytics-top"></tbody></table></div>
+      </div>
     </div>
 
     <!-- IMPORT/EXPORT -->
@@ -328,12 +371,13 @@ function goPage(name){
   document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});
   var pg=document.getElementById('page-'+name);if(pg)pg.classList.add('active');
   document.querySelectorAll('.ni').forEach(function(n){if((n.getAttribute('onclick')||'').indexOf("'"+name+"'")>-1)n.classList.add('active');});
-  var t=document.getElementById('page-title');if(t)t.textContent={dashboard:'Dashboard',students:'Students',marks:'Marks and Grades',subjects:'Subjects',results:'Results and Report',import:'Import / Export'}[name]||name;
+  var t=document.getElementById('page-title');if(t)t.textContent={dashboard:'Dashboard',students:'Students',marks:'Marks and Grades',subjects:'Subjects',results:'Results and Report',analytics:'Analytics',import:'Import / Export'}[name]||name;
   if(name==='dashboard')renderDash();
   if(name==='students')renderStudents('');
   if(name==='marks')renderMarks();
   if(name==='subjects')renderSubjects();
   if(name==='results')renderResults();
+  if(name==='analytics')renderAnalytics();
 }
 
 function openModal(id){var e=document.getElementById(id);if(e)e.classList.add('open');if(id==='mo-marks')buildMarksForm();if(id==='mo-github')loadGHConfig();}
@@ -778,6 +822,75 @@ function doImport(){
   if(res)res.innerHTML='<div class="sbar">'+added+' records imported! Go to Dashboard to view the data.</div>';
 }
 
+var _donutChart=null,_barChart=null;
+function renderAnalytics(){
+  var TERMS=['Semester I','Semester II','Semester III','Semester IV','Semester V','Semester VI','Semester VII','Semester VIII'];
+  var latestTerm='';
+  if(marksData.length){
+    var termCounts={};marksData.forEach(function(m){termCounts[m.term]=(termCounts[m.term]||0)+1;});
+    latestTerm=Object.keys(termCounts).sort(function(a,b){return TERMS.indexOf(b)-TERMS.indexOf(a);})[0];
+  }
+  var el=document.getElementById('analytics-term-lbl');
+  if(el)el.textContent=latestTerm||'No data yet';
+  var termMarks=marksData.filter(function(m){return m.term===latestTerm;});
+  var total=termMarks.length;
+  var pass=termMarks.filter(function(m){return m.status==='Pass';}).length;
+  var avg=total?Math.round(termMarks.reduce(function(a,m){return a+calcRow(m).pct;},0)/total):0;
+  var grades=['O','A+','A','B+','B','C','F'];
+  var gCounts=grades.map(function(g){return termMarks.filter(function(m){return grade(calcRow(m).pct)===g;}).length;});
+  var statsEl=document.getElementById('analytics-stats');
+  if(statsEl)statsEl.innerHTML=
+    '<div class="sc c-blue"><div class="sc-num c-blue">'+total+'</div><div class="sc-lbl">Students</div><div class="sc-sub c-blue">in '+latestTerm+'</div></div>'+
+    '<div class="sc c-teal"><div class="sc-num c-teal">'+pass+'</div><div class="sc-lbl">Passed</div><div class="sc-sub c-teal">'+(total?Math.round(pass/total*100):0)+'%</div></div>'+
+    '<div class="sc c-amb"><div class="sc-num c-amb">'+avg+'%</div><div class="sc-lbl">Class Average</div><div class="sc-sub c-amb">'+grade(avg)+' average</div></div>'+
+    '<div class="sc c-red"><div class="sc-num c-red">'+(total-pass)+'</div><div class="sc-lbl">Failed</div><div class="sc-sub c-red">'+(total?Math.round((total-pass)/total*100):0)+'%</div></div>';
+  if(_donutChart){_donutChart.destroy();}
+  var dc=document.getElementById('grade-donut');
+  if(dc){
+    _donutChart=new Chart(dc.getContext('2d'),{type:'doughnut',data:{labels:grades,datasets:[{data:gCounts,backgroundColor:['#3fb950','#bc8cff','#79c0ff','#56d364','#d29922','#f0883e','#f85149'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8b949e',font:{size:10},padding:8}}}}});
+  }
+  if(_barChart){_barChart.destroy();}
+  var bc=document.getElementById('sub-avg-bar');
+  if(bc&&subjects.length){
+    var subAvgs=subjects.map(function(sub){
+      var vals=termMarks.map(function(m){var sm=m.marks&&m.marks[sub.name];if(!sm)return 0;return calcCCE(sm)+(parseInt(sm.ese)||0)+(parseInt(sm.tw)||0);});
+      return vals.length?Math.round(vals.reduce(function(a,v){return a+v;},0)/vals.length):0;
+    });
+    _barChart=new Chart(bc.getContext('2d'),{type:'bar',data:{labels:subjects.map(function(s){return s.name.length>8?s.name.slice(0,8)+'…':s.name;}),datasets:[{data:subAvgs,backgroundColor:['#58a6ff','#39d353','#d29922','#bc8cff','#f85149','#79c0ff','#f0883e'],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#6e7681',font:{size:10}},grid:{color:'#30363d'}},y:{ticks:{color:'#6e7681',font:{size:10}},grid:{color:'#30363d'},min:0,max:125}}}});
+  }
+  var hm=document.getElementById('heatmap');
+  if(hm&&subjects.length&&termMarks.length){
+    var stusSorted=termMarks.slice().sort(function(a,b){return calcRow(b).pct-calcRow(a).pct;});
+    var hmHtml='<table style="border-collapse:collapse;font-size:10px;font-family:JetBrains Mono,monospace"><thead><tr><th style="padding:4px 8px;color:var(--text2);text-align:left;white-space:nowrap">Student</th>'+
+      subjects.map(function(s){return'<th style="padding:4px 6px;color:var(--text2);text-align:center;white-space:nowrap">'+s.name.slice(0,6)+'…</th>';}).join('')+
+      '<th style="padding:4px 6px;color:var(--text2);text-align:center">Avg</th></tr></thead><tbody>';
+    stusSorted.forEach(function(m){
+      var stu=students.find(function(s){return s.id===m.studentId;})||{name:'?',roll:'?'};
+      hmHtml+='<tr><td style="padding:4px 8px;white-space:nowrap;color:var(--text);max-width:120px;overflow:hidden;text-overflow:ellipsis">'+esc(stu.name)+'</td>';
+      var subTots=subjects.map(function(sub){var sm=m.marks&&m.marks[sub.name];if(!sm)return 0;return calcCCE(sm)+(parseInt(sm.ese)||0)+(parseInt(sm.tw)||0);});
+      subTots.forEach(function(tot){
+        var pct=Math.round(tot/125*100);
+        var alpha=0.1+pct/100*0.7;
+        var bg=pct>=80?'rgba(57,211,83,'+alpha+')':pct>=60?'rgba(88,166,255,'+alpha+')':pct>=45?'rgba(210,153,34,'+alpha+')':'rgba(248,81,73,'+alpha+')';
+        hmHtml+='<td style="padding:5px 8px;text-align:center;background:'+bg+';color:var(--text);border-radius:3px;margin:1px">'+tot+'</td>';
+      });
+      var rowAvg=subTots.length?Math.round(subTots.reduce(function(a,v){return a+v;},0)/subTots.length):0;
+      hmHtml+='<td style="padding:4px 8px;text-align:center;font-weight:600;color:var(--cyan)">'+rowAvg+'</td></tr>';
+    });
+    hmHtml+='</tbody></table>';
+    hm.innerHTML=hmHtml;
+  } else if(hm){hm.innerHTML='<div style="text-align:center;padding:1rem;color:var(--text3);font-size:12px;font-family:JetBrains Mono,monospace">No data for '+latestTerm+'</div>';}
+  var topEl=document.getElementById('analytics-top');
+  if(topEl){
+    var topSorted=termMarks.slice().sort(function(a,b){return calcRow(b).pct-calcRow(a).pct;}).slice(0,10);
+    topEl.innerHTML=topSorted.map(function(m,i){
+      var stu=students.find(function(s){return s.id===m.studentId;})||{name:'?',roll:'?'};
+      var r=calcRow(m);var g2=grade(r.pct);
+      var ri=i===0?'<span style="color:var(--amber);font-weight:700">★ 1</span>':i===1?'<span style="color:var(--text2)">② 2</span>':i===2?'<span style="color:#cd7f32">③ 3</span>':(i+1);
+      return'<tr><td class="tm">'+ri+'</td><td style="font-weight:500">'+esc(stu.name)+'</td><td class="tm td2">'+esc(stu.roll)+'</td><td class="tm">'+r.pct+'%</td><td><span class="badge '+gbc(g2)+'">'+g2+'</span></td><td>'+sbadge(m.status)+'</td></tr>';
+    }).join('')||'<tr><td colspan="6" class="loading">No data</td></tr>';
+  }
+}
 function loadGHConfig(){var cfg=JSON.parse(localStorage.getItem('gh_cfg')||'{}');document.getElementById('gh-token').value=cfg.token||'';document.getElementById('gh-user').value=cfg.user||'nakulgodse1307-ai';document.getElementById('gh-repo').value=cfg.repo||'dbms-result-system';document.getElementById('gh-branch').value=cfg.branch||'main';}
 function saveGHConfig(){
   var cfg={token:(document.getElementById('gh-token').value||'').trim(),user:(document.getElementById('gh-user').value||'').trim(),repo:(document.getElementById('gh-repo').value||'').trim(),branch:(document.getElementById('gh-branch').value||'main').trim()};
@@ -822,15 +935,18 @@ function pushGH(){
     .catch(function(e){setSyncStatus('Push failed',false);alert('Push error: '+e.message);});
 }
 function pullGH(){
-  var cfg=getGHCfg();if(!cfg)return;
+  var cfg=JSON.parse(localStorage.getItem('gh_cfg')||'{}');
+  var user=cfg.user||'nakulgodse1307-ai';
+  var repo=cfg.repo||'dbms-result-system';
+  var branch=cfg.branch||'main';
   setSyncStatus('Pulling...',false);
-  fetch('https://api.github.com/repos/'+cfg.user+'/'+cfg.repo+'/contents/data.json',{headers:{'Authorization':'token '+cfg.token,'Accept':'application/vnd.github.v3+json'}})
+  var rawUrl='https://raw.githubusercontent.com/'+user+'/'+repo+'/'+branch+'/data.json?t='+Date.now();
+  fetch(rawUrl)
     .then(function(r){
-      if(!r.ok)throw new Error(r.status===404?'data.json not found on GitHub. Open app on laptop and Push first.':'HTTP error '+r.status+'. Check your token and repo name.');
-      return r.json();
+      if(!r.ok)throw new Error(r.status===404?'No data found. Please Push data from laptop first.':'Connection error '+r.status+'. Check internet.');
+      return r.text();
     })
-    .then(function(d){
-      var text=fromBase64(d.content);
+    .then(function(text){
       var data=JSON.parse(text);
       if(data.students)students=data.students;
       if(data.subjects)subjects=data.subjects;
@@ -838,17 +954,54 @@ function pullGH(){
       if(data.nextStuId)nextStuId=data.nextStuId;
       if(data.nextMarkId)nextMarkId=data.nextMarkId;
       setSyncStatus('Pulled '+new Date().toLocaleTimeString(),true);
-      setGHStatus(true,cfg.user+'/'+cfg.repo);
+      if(cfg.token)setGHStatus(true,user+'/'+repo);
       renderDash();
-      alert('Data pulled successfully!\nLast pushed: '+(data.pushTime?new Date(data.pushTime).toLocaleString():'unknown'));
+      alert('Data pulled successfully!\nLast updated: '+(data.pushTime?new Date(data.pushTime).toLocaleString():'unknown'));
     })
     .catch(function(e){
       setSyncStatus('Pull failed',false);
-      alert('Pull failed: '+e.message+'\n\nCommon fixes:\n1. Check GitHub Config token is correct\n2. Make sure data was Pushed from laptop first\n3. Check internet connection');
+      alert('Pull failed: '+e.message);
     });
 }
 
-(function(){var cfg=JSON.parse(localStorage.getItem('gh_cfg')||'{}');if(cfg.token)setGHStatus(true,cfg.user+'/'+cfg.repo);renderDash();updTabs();})();
+function checkPwd(){
+  var pwd=document.getElementById('lock-pwd').value;
+  var TEACHER_PWD='dbms2024';
+  if(pwd===TEACHER_PWD){
+    document.getElementById('lock-screen').style.display='none';
+    localStorage.setItem('teacher_auth','yes');
+  } else {
+    document.getElementById('lock-err').style.display='block';
+    document.getElementById('lock-pwd').value='';
+    document.getElementById('lock-pwd').focus();
+  }
+}
+
+(function(){
+  if(localStorage.getItem('teacher_auth')==='yes'){
+    document.getElementById('lock-screen').style.display='none';
+  }
+  var cfg=JSON.parse(localStorage.getItem('gh_cfg')||'{}');
+  if(cfg.token)setGHStatus(true,(cfg.user||'nakulgodse1307-ai')+'/'+(cfg.repo||'dbms-result-system'));
+  renderDash();updTabs();
+  var user=cfg.user||'nakulgodse1307-ai';
+  var repo=cfg.repo||'dbms-result-system';
+  var branch=cfg.branch||'main';
+  fetch('https://raw.githubusercontent.com/'+user+'/'+repo+'/'+branch+'/data.json?t='+Date.now())
+    .then(function(r){return r.ok?r.text():null;})
+    .then(function(text){
+      if(!text)return;
+      var data=JSON.parse(text);
+      if(data.students)students=data.students;
+      if(data.subjects)subjects=data.subjects;
+      if(data.marksData)marksData=data.marksData;
+      if(data.nextStuId)nextStuId=data.nextStuId;
+      if(data.nextMarkId)nextMarkId=data.nextMarkId;
+      setSyncStatus('Auto-pulled '+new Date().toLocaleTimeString(),true);
+      renderDash();updTabs();
+    })
+    .catch(function(){});
+})();
 </script>
 </body>
 </html>
