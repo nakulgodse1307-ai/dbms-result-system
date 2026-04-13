@@ -44,6 +44,15 @@
       "prn": 8275,
       "email": "",
       "phone": ""
+    },
+    {
+      "id": 6,
+      "roll": 1,
+      "name": "jayesh",
+      "div": "A",
+      "prn": 55,
+      "email": "",
+      "phone": ""
     }
   ],
   "subjects": [
@@ -176,9 +185,39 @@
           "tw": 0
         }
       }
+    },
+    {
+      "id": 5,
+      "studentId": 6,
+      "term": "Semester I",
+      "status": "Pass",
+      "marks": {
+        "dbms": {
+          "cce": [
+            8,
+            8,
+            8,
+            8,
+            8
+          ],
+          "ese": 60,
+          "tw": 25
+        },
+        "m3": {
+          "cce": [
+            8,
+            7,
+            1,
+            1,
+            1
+          ],
+          "ese": 60,
+          "tw": 25
+        }
+      }
     }
   ],
-  "nextStuId": 6,
-  "nextMarkId": 5,
-  "pushTime": "2026-04-13T09:57:33.025Z"
+  "nextStuId": 7,
+  "nextMarkId": 6,
+  "pushTime": "2026-04-13T15:53:21.616Z"
 }
