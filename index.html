@@ -1233,7 +1233,7 @@ function checkPwd(){
   var TEACHER_PWD='dbms2024';
   if(pwd===TEACHER_PWD){
     document.getElementById('lock-screen').style.display='none';
-    sessionStorage.setItem('teacher_auth','yes');
+    /* logged in */
   } else {
     document.getElementById('lock-err').style.display='block';
     document.getElementById('lock-pwd').value='';
@@ -1242,9 +1242,6 @@ function checkPwd(){
 }
 
 (function(){
-  if(sessionStorage.getItem('teacher_auth')==='yes'){
-    document.getElementById('lock-screen').style.display='none';
-  }
   var cfg=JSON.parse(localStorage.getItem('gh_cfg')||'{}');
   if(cfg.token)setGHStatus(true,(cfg.user||'nakulgodse1307-ai')+'/'+(cfg.repo||'dbms-result-system'));
   renderDash();updTabs();
