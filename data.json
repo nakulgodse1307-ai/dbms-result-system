@@ -53,6 +53,15 @@
       "prn": 55,
       "email": "",
       "phone": ""
+    },
+    {
+      "id": 7,
+      "roll": "50",
+      "name": "bhavesh",
+      "div": "A",
+      "prn": "5555",
+      "email": "nhvxnhdvxhdvx@gmail.com",
+      "phone": "8275254619"
     }
   ],
   "subjects": [
@@ -194,30 +203,60 @@
       "marks": {
         "dbms": {
           "cce": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "ese": 0,
+          "tw": 0
+        },
+        "m3": {
+          "cce": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "ese": 0,
+          "tw": 0
+        }
+      }
+    },
+    {
+      "id": 6,
+      "studentId": 7,
+      "term": "Semester I",
+      "status": "Pass",
+      "marks": {
+        "dbms": {
+          "cce": [
             8,
-            8,
+            7,
             8,
             8,
             8
           ],
-          "ese": 60,
-          "tw": 25
+          "ese": 24,
+          "tw": 20
         },
         "m3": {
           "cce": [
             8,
+            5,
             7,
-            1,
-            1,
-            1
+            2,
+            8
           ],
-          "ese": 60,
-          "tw": 25
+          "ese": 44,
+          "tw": 21
         }
       }
     }
   ],
-  "nextStuId": 7,
-  "nextMarkId": 6,
-  "pushTime": "2026-04-13T15:53:21.616Z"
+  "nextStuId": 8,
+  "nextMarkId": 7,
+  "pushTime": "2026-04-21T06:04:21.477Z"
 }
